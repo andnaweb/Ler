@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
+    <!-- TAGS SUPREMAS: Permitem transformar o arquivo em App nativo sem barras ao "Adicionar à Tela Inicial" -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
@@ -33,7 +34,7 @@
 
         /* Proteção Tipográfica Estrutural em Cascata */
         *, *::before, *::after {
-            box-sizing: border-box;
+            box-sizing: border-box !important;
             max-height: 999999px !important; 
             -webkit-text-size-adjust: 100% !important;
             text-size-adjust: 100% !important;
@@ -64,7 +65,7 @@
             transition: background-color 0.25s, color 0.25s;
         }
 
-        /* Correção Crítica: Forçar estabilidade quando o elemento entra em modo Fullscreen nativo */
+        /* Forçar estabilização rígida quando o elemento entra em modo Fullscreen nativo */
         .screen:fullscreen {
             width: 100% !important;
             height: 100% !important;
@@ -153,34 +154,51 @@
             transition: width 0.25s ease;
         }
 
-        /* Painel de Controle Flutuante Otimizado */
+        /* BLINDAGEM DO PAINEL FLUTUANTE: Centralização por ganchos laterais (Left/Right) sem quebra por transform */
         .control-hub {
             position: fixed;
-            bottom: 12px; left: 50%;
-            transform: translate(-50%, 130%);
-            width: 94%; max-width: 410px;
+            bottom: 12px; 
+            left: 12px;
+            right: 12px;
+            margin: 0 auto !important;
+            width: calc(100% - 24px) !important; 
+            max-width: 410px !important;
+            
             max-height: calc(100% - 24px);
             overflow-y: auto;
+            overflow-x: hidden; /* Corta qualquer tentativa de vazamento horizontal */
             background: rgba(255, 255, 255, 0.98);
             border: 1px solid #cbd5e1;
             padding: 14px; border-radius: 16px;
             box-shadow: 0 12px 40px rgba(0,0,0,0.3);
             display: flex; flex-direction: column; gap: 10px;
-            z-index: 100; opacity: 0; visibility: hidden;
+            z-index: 1000; opacity: 0; visibility: hidden;
+            
+            /* O transform agora cuida estritamente do eixo Y (subida/descida do painel) */
+            transform: translateY(150%);
             transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, visibility 0.2s;
             color: #334155;
         }
-        .control-hub.active { transform: translate(-50%, 0); opacity: 1; visibility: visible; }
-        .control-row { display: flex; justify-content: space-between; align-items: center; gap: 6px; width: 100%; }
+        .control-hub.active { transform: translateY(0); opacity: 1; visibility: visible; }
+        
+        .control-row { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            gap: 6px; 
+            width: 100%;
+            min-width: 0; /* Bloqueia expansões fantasmas de elementos filhos */
+        }
 
-        /* Correção de Layout nos Botões: Impedir estouro e permitir quebra de linha controlada */
+        /* Ajuste de Segurança nos Botões: Truncar texto longo caso falte espaço na tela */
         .btn {
             flex: 1; background-color: #f1f5f9; border: 1px solid #cbd5e1; color: #334155;
             padding: 10px 4px; border-radius: 8px; cursor: pointer; font-size: 12px;
             font-weight: 600; text-align: center;
-            white-space: normal; 
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis; /* Adiciona '...' se o texto for maior que o botão */
             min-width: 0;
-            display: flex; align-items: center; justify-content: center;
         }
         .btn-prime { background-color: #2563eb; color: white; border: none; }
         .file-upload-wrapper { position: relative; overflow: hidden; flex: 1; display: flex; min-width: 0; }
@@ -190,6 +208,7 @@
             padding: 8px 4px; border-radius: 8px; border: 1px solid #cbd5e1;
             background: white; font-size: 12px; flex: 1; color: #334155; height: 36px;
             min-width: 0;
+            width: 100%;
         }
 
         /* REGRAS EXCLUSIVAS PARA TELAS EM MODO HORIZONTAL (PAISAGEM) */
@@ -255,6 +274,7 @@
 
 <div class="overlay" id="uiOverlay"></div>
 
+<!-- PAINEL DE CONTROLE -->
 <div class="control-hub" id="controlHub">
     <div class="control-row" style="border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; margin-bottom: 2px;">
         <span style="font-weight: bold; font-size: 13px; color: #64748b;">Configurações do Leitor</span>
@@ -271,7 +291,7 @@
 
     <div class="control-row">
         <button class="btn" id="btnFontMinus">A-</button>
-        <span id="lblZoomType" style="font-size:12px; font-weight:bold; min-width:75px; text-align:center;">Texto 17px</span>
+        <span id="lblZoomType" style="font-size:12px; font-weight:bold; min-width:65px; text-align:center;">Texto 17px</span>
         <button class="btn" id="btnFontPlus">A+</button>
         <button class="btn" id="btnOpenBookmarks">🔖 Marcadores</button>
     </div>
@@ -533,7 +553,6 @@
         controlHub.classList.remove('active');
     });
 
-    // CORREÇÃO CRÍTICA DO MOTOR DE TELA CHEIA (FOCANDO NO ELEMENTO DA TELA E NÃO NO DOCUMENTO)
     btnFullscreen.addEventListener('click', (e) => {
         e.stopPropagation();
         const target = document.getElementById('globalBody'); 
@@ -561,7 +580,6 @@
             btnFullscreen.style.backgroundColor = "#e2e8f0";
         }
         
-        // Multi-stage checks para garantir que a paginação só rode após o celular estabilizar o novo tamanho
         const recalculate = () => {
             if (currentBook && !currentBook.isPDF && currentBook.text) {
                 currentBook.pages = paginateText(currentBook.text);
@@ -571,7 +589,7 @@
             }
         };
         setTimeout(recalculate, 80);
-        setTimeout(recalculate, 250); 
+        setTimeout(recalculate, 300); 
     }
     document.addEventListener('fullscreenchange', monitorFullscreen);
     document.addEventListener('webkitfullscreenchange', monitorFullscreen);
