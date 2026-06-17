@@ -65,18 +65,6 @@
             transition: background-color 0.25s, color 0.25s;
         }
 
-        /* Forçar estabilização rígida quando o elemento entra em modo Fullscreen nativo */
-        .screen:fullscreen {
-            width: 100% !important;
-            height: 100% !important;
-            padding: 12px 16px !important;
-        }
-        .screen:-webkit-full-screen {
-            width: 100% !important;
-            height: 100% !important;
-            padding: 12px 16px !important;
-        }
-
         .screen.light { background-color: var(--screen-light); color: var(--text-light); --accent-bar: #2563eb; }
         .screen.dark { background-color: var(--screen-dark); color: var(--text-dark); --accent-bar: #94a3b8; }
         .screen.sepia { background-color: var(--screen-sepia); color: var(--text-sepia); --accent-bar: #b45309; }
@@ -154,7 +142,7 @@
             transition: width 0.25s ease;
         }
 
-        /* BLINDAGEM DO PAINEL FLUTUANTE: Centralização por ganchos laterais (Left/Right) sem quebra por transform */
+        /* BLINDAGEM DO PAINEL FLUTUANTE: Centralização por ganchos laterais sem quebra por transform */
         .control-hub {
             position: fixed;
             bottom: 12px; 
@@ -166,7 +154,7 @@
             
             max-height: calc(100% - 24px);
             overflow-y: auto;
-            overflow-x: hidden; /* Corta qualquer tentativa de vazamento horizontal */
+            overflow-x: hidden;
             background: rgba(255, 255, 255, 0.98);
             border: 1px solid #cbd5e1;
             padding: 14px; border-radius: 16px;
@@ -174,7 +162,6 @@
             display: flex; flex-direction: column; gap: 10px;
             z-index: 1000; opacity: 0; visibility: hidden;
             
-            /* O transform agora cuida estritamente do eixo Y (subida/descida do painel) */
             transform: translateY(150%);
             transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, visibility 0.2s;
             color: #334155;
@@ -187,7 +174,7 @@
             align-items: center; 
             gap: 6px; 
             width: 100%;
-            min-width: 0; /* Bloqueia expansões fantasmas de elementos filhos */
+            min-width: 0;
         }
 
         /* Ajuste de Segurança nos Botões: Truncar texto longo caso falte espaço na tela */
@@ -197,7 +184,7 @@
             font-weight: 600; text-align: center;
             white-space: nowrap;
             overflow: hidden;
-            text-overflow: ellipsis; /* Adiciona '...' se o texto for maior que o botão */
+            text-overflow: ellipsis;
             min-width: 0;
         }
         .btn-prime { background-color: #2563eb; color: white; border: none; }
@@ -553,9 +540,10 @@
         controlHub.classList.remove('active');
     });
 
+    // SISTEMA FULLSCREEN CORRIGIDO: Alveja o documentElement para blindar contra Font Boosting mobile
     btnFullscreen.addEventListener('click', (e) => {
         e.stopPropagation();
-        const target = document.getElementById('globalBody'); 
+        const target = document.documentElement; 
         if (!document.fullscreenElement && !document.webkitFullscreenElement) {
             if (target.requestFullscreen) {
                 target.requestFullscreen();
@@ -588,8 +576,7 @@
                 render();
             }
         };
-        setTimeout(recalculate, 80);
-        setTimeout(recalculate, 300); 
+        setTimeout(recalculate, 100);
     }
     document.addEventListener('fullscreenchange', monitorFullscreen);
     document.addEventListener('webkitfullscreenchange', monitorFullscreen);
@@ -713,7 +700,6 @@
         library.forEach(book => {
             const row = document.createElement('div');
             row.className = 'panel-item';
-            row.style.semibold = '6px';
             
             const infoArea = document.createElement('div');
             infoArea.style.flexGrow = '1';
