@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <!-- TAGS SUPREMAS: Permitem transformar o arquivo em App nativo sem barras ao "Adicionar à Tela Inicial" -->
+    <!-- TAGS SUPREMAS: Modo App nativo sem barras ao "Adicionar à Tela Inicial" -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
@@ -14,7 +14,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     
     <style>
-        /* BLOQUEIO ABSOLUTO DE COMPORTAMENTOS PARASITAS DE NAVEGADORES MOBILE */
+        /* BLOQUEIO ABSOLUTO DE COMPORTAMENTOS PARASITAS (FONT BOOSTING ANTI-BUG IMAGEM 1000030072.jpg) */
+        html, body, div, span, button, select, p, h3 {
+            -webkit-text-size-adjust: 100% !important;
+            text-size-adjust: 100% !important;
+            -moz-text-size-adjust: 100% !important;
+            max-height: 999999px !important; /* Truque mestre para desativar o Autosizing do Chrome */
+        }
+
         html, body {
             width: 100% !important;
             height: 100% !important;
@@ -25,21 +32,12 @@
             top: 0; left: 0; right: 0; bottom: 0;
             background-color: #111;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            
-            /* Trava Definitiva Antifont-Boosting */
-            -webkit-text-size-adjust: 100% !important;
-            text-size-adjust: 100% !important;
-            -moz-text-size-adjust: 100% !important;
-        }
-
-        /* Proteção Tipográfica Estrutural em Cascata */
-        *, *::before, *::after {
-            box-sizing: border-box !important;
-            max-height: 999999px !important; 
-            -webkit-text-size-adjust: 100% !important;
-            text-size-adjust: 100% !important;
             user-select: none;
             -webkit-user-select: none;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box !important;
         }
 
         :root {
@@ -52,7 +50,7 @@
             --accent-bar: #2563eb;
         }
 
-        /* Container da Tela Ocupando Exatamente 100% do Viewport Físico */
+        /* Container da Tela Principal */
         .screen {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -76,7 +74,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 13px;
+            font-size: 13px !important;
             opacity: 0.75;
             width: 100%;
         }
@@ -84,7 +82,7 @@
         .footer-bar { padding-top: 4px; }
         .screen.dark .top-bar { border-bottom-color: rgba(255,255,255,0.08); }
 
-        .bookmark-icon { font-size: 16px; cursor: pointer; padding: 0 6px; }
+        .bookmark-icon { font-size: 16px !important; cursor: pointer; padding: 0 6px; }
         .bookmark-icon.active { color: #e53e3e; }
 
         /* Motor de Layout de Texto E-Reader Pro */
@@ -103,14 +101,6 @@
             justify-content: flex-start;
             align-items: center;
             -webkit-overflow-scrolling: touch;
-            -ms-overflow-style: none;  
-            scrollbar-width: none;  
-        }
-
-        .book-content::-webkit-scrollbar {
-            display: none !important;
-            width: 0 !important;
-            height: 0 !important;
         }
 
         .book-content div { width: 100%; }
@@ -123,7 +113,7 @@
             object-fit: contain; 
         }
 
-        /* Barra de Progresso Visual Premium */
+        /* Barra de Progresso Visual */
         .progress-track {
             width: 100%;
             height: 3px;
@@ -142,7 +132,7 @@
             transition: width 0.25s ease;
         }
 
-        /* BLINDAGEM DO PAINEL FLUTUANTE: Centralização por ganchos laterais sem quebra por transform */
+        /* PAINEL FLUTUANTE TOTALMENTE IMUNE A DEFORMAÇÕES */
         .control-hub {
             position: fixed;
             bottom: 12px; 
@@ -151,7 +141,6 @@
             margin: 0 auto !important;
             width: calc(100% - 24px) !important; 
             max-width: 410px !important;
-            
             max-height: calc(100% - 24px);
             overflow-y: auto;
             overflow-x: hidden;
@@ -160,8 +149,7 @@
             padding: 14px; border-radius: 16px;
             box-shadow: 0 12px 40px rgba(0,0,0,0.3);
             display: flex; flex-direction: column; gap: 10px;
-            z-index: 1000; opacity: 0; visibility: hidden;
-            
+            z-index: 99999 !important; opacity: 0; visibility: hidden;
             transform: translateY(150%);
             transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, visibility 0.2s;
             color: #334155;
@@ -175,12 +163,14 @@
             gap: 6px; 
             width: 100%;
             min-width: 0;
+            flex-shrink: 0;
         }
 
-        /* Ajuste de Segurança nos Botões: Truncar texto longo caso falte espaço na tela */
+        /* Botões com fontes rigidamente travadas em px */
         .btn {
             flex: 1; background-color: #f1f5f9; border: 1px solid #cbd5e1; color: #334155;
-            padding: 10px 4px; border-radius: 8px; cursor: pointer; font-size: 12px;
+            padding: 10px 4px; border-radius: 8px; cursor: pointer; 
+            font-size: 12px !important;
             font-weight: 600; text-align: center;
             white-space: nowrap;
             overflow: hidden;
@@ -193,22 +183,29 @@
 
         select {
             padding: 8px 4px; border-radius: 8px; border: 1px solid #cbd5e1;
-            background: white; font-size: 12px; flex: 1; color: #334155; height: 36px;
+            background: white; font-size: 12px !important; flex: 1; color: #334155; height: 36px;
             min-width: 0;
             width: 100%;
         }
 
-        /* REGRAS EXCLUSIVAS PARA TELAS EM MODO HORIZONTAL (PAISAGEM) */
+        /* Trava do botão fechar para não virar uma pílula gigante */
+        #btnCloseHub {
+            flex: none !important;
+            width: 32px !important;
+            height: 28px !important;
+            padding: 0 !important;
+            background: #cbd5e1;
+            color: #1e293b;
+            border: none;
+            font-size: 14px !important;
+            line-height: 28px !important;
+        }
+
         @media (max-height: 450px) {
-            .control-hub {
-                bottom: 6px;
-                padding: 10px;
-                gap: 6px;
-                border-radius: 12px;
-            }
+            .control-hub { bottom: 6px; padding: 10px; gap: 6px; border-radius: 12px; }
             .control-row { gap: 4px; }
-            .btn { padding: 6px 4px; font-size: 11px; border-radius: 6px; }
-            select { height: 30px; font-size: 11px; padding: 4px; border-radius: 6px; }
+            .btn { padding: 6px 4px; font-size: 11px !important; border-radius: 6px; }
+            select { height: 30px; font-size: 11px !important; padding: 4px; border-radius: 6px; }
         }
 
         /* Gavetas Modais Laterais */
@@ -226,10 +223,10 @@
         
         .panel-item { 
             padding: 10px 12px; background: #f8fafc; border: 1px solid #e2e8f0; 
-            border-radius: 8px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; 
+            border-radius: 8px; font-size: 13px !important; display: flex; justify-content: space-between; align-items: center; 
         }
         .delete-btn {
-            background: none; border: none; padding: 6px; cursor: pointer; font-size: 14px;
+            background: none; border: none; padding: 6px; cursor: pointer; font-size: 14px !important;
             border-radius: 6px; transition: background 0.2s;
         }
         .delete-btn:active { background: #fee2e2; }
@@ -242,8 +239,8 @@
 
 <div class="screen sepia" id="globalBody">
     <div class="top-bar">
-        <span id="uiTitle" style="max-width: 55%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: bold;">Carregando...</span>
-        <span id="uiClock">00:00</span>
+        <span id="uiTitle" style="max-width: 55%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: bold; font-size: 13px !important;">Carregando...</span>
+        <span id="uiClock" style="font-size: 13px !important;">00:00</span>
         <span class="bookmark-icon" id="btnBookmark">🏳️</span>
     </div>
     
@@ -254,18 +251,18 @@
     </div>
 
     <div class="footer-bar">
-        <span id="uiProgress">Pág. 1 de 1</span>
-        <span id="uiPercentage">0%</span>
+        <span id="uiProgress" style="font-size: 13px !important;">Pág. 1 de 1</span>
+        <span id="uiPercentage" style="font-size: 13px !important;">0%</span>
     </div>
 </div>
 
 <div class="overlay" id="uiOverlay"></div>
 
-<!-- PAINEL DE CONTROLE -->
+<!-- PAINEL DE CONTROLE BRINDADO -->
 <div class="control-hub" id="controlHub">
     <div class="control-row" style="border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; margin-bottom: 2px;">
-        <span style="font-weight: bold; font-size: 13px; color: #64748b;">Configurações do Leitor</span>
-        <button class="btn" id="btnCloseHub" style="max-width: 32px; height: 26px; padding: 0; background: #cbd5e1; color: #1e293b; border: none;">X</button>
+        <span style="font-weight: bold; font-size: 13px !important; color: #64748b; flex: 1;">Configurações do Leitor</span>
+        <button class="btn" id="btnCloseHub">X</button>
     </div>
 
     <div class="control-row">
@@ -278,7 +275,7 @@
 
     <div class="control-row">
         <button class="btn" id="btnFontMinus">A-</button>
-        <span id="lblZoomType" style="font-size:12px; font-weight:bold; min-width:65px; text-align:center;">Texto 17px</span>
+        <span id="lblZoomType" style="font-size:12px !important; font-weight:bold; min-width:65px; text-align:center; color: #334155;">Texto 17px</span>
         <button class="btn" id="btnFontPlus">A+</button>
         <button class="btn" id="btnOpenBookmarks">🔖 Marcadores</button>
     </div>
@@ -311,7 +308,7 @@
 
 <div class="side-panel" id="panelLibrary">
     <div class="panel-header">
-        <h3 style="font-size: 16px;">Sua Biblioteca</h3>
+        <h3 style="font-size: 16px !important; margin:0;">Sua Biblioteca</h3>
         <button class="btn" onclick="closePanels()" style="max-width:35px; padding: 4px;">X</button>
     </div>
     <div class="panel-list" id="libraryList"></div>
@@ -319,14 +316,13 @@
 
 <div class="side-panel" id="panelBookmarks">
     <div class="panel-header">
-        <h3 style="font-size: 16px;">Marcadores</h3>
+        <h3 style="font-size: 16px !important; margin:0;">Marcadores</h3>
         <button class="btn" onclick="closePanels()" style="max-width:35px; padding: 4px;">X</button>
     </div>
     <div class="panel-list" id="bookmarksList"></div>
 </div>
 
 <script>
-    // --- BANCO DE DADOS INDEXEDDB PARA ARQUIVOS SENSÍVEIS (PDFs) ---
     const DB_NAME = "KindleOS_Storage_DB";
     let localDB = null;
     const dbRequest = indexedDB.open(DB_NAME, 1);
@@ -366,7 +362,6 @@
     const defaultBookText = `Dom Casmurro\n\nCapítulo 1 - Do título\n\nUma noite destes, vindo da cidade para o Engenho Novo, encontrei no trem da Central um rapaz aqui do bairro, que eu conheço de vista e de chapéu. Cumprimentou-me, sentou-se ao pé de mim, falou da lua e dos ministros, e acabou recitando-me versos. O trem seguiu, os versos continuaram, e a viagem parecia-me cada vez mais longa. Como eu não souumesse os versos de cor, limitei-me a abanar a cabeça em sinal de aprovação, mas o rapaz notou a minha distração e parou magoado.`;
 
     const DB_PREFIX = "kindle_v8_ultimate_";
-
     const memoryStorage = {};
     const safeStorage = {
         getItem: function(key) { try { return localStorage.getItem(key); } catch(e) { return memoryStorage[key] || null; } },
@@ -406,7 +401,6 @@
         if (!text) return [" [Sem conteúdo estruturado] "];
         const pages = [];
         let index = 0;
-        
         let width = bookContent.clientWidth || window.innerWidth;
         let height = bookContent.clientHeight || window.innerHeight;
         
@@ -419,7 +413,6 @@
         
         const currentLineHeight = parseFloat(bookContent.style.lineHeight || "1.6");
         const spacingCompensation = 1.6 / currentLineHeight;
-        
         const adjustedCharCount = Math.max(140, Math.floor((baseChars - ((fontSize - 17) * 28)) * spacingCompensation));
 
         while (index < text.length) {
@@ -459,9 +452,7 @@
             currentBook.pdfDoc.getPage(currentPage + 1).then(function(page) {
                 const unscaledViewport = page.getViewport({ scale: 1 });
                 const containerW = bookContent.clientWidth || window.innerWidth;
-                
                 const baseScale = (containerW - 8) / unscaledViewport.width;
-                
                 const viewport = page.getViewport({ scale: baseScale * pdfZoom });
                 canvas.height = viewport.height;
                 canvas.width = viewport.width;
@@ -482,7 +473,6 @@
             
             let totalTxtPages = currentBook.pages ? currentBook.pages.length : 1;
             if (totalTxtPages <= 0) totalTxtPages = 1;
-            
             if(currentPage >= totalTxtPages) currentPage = totalTxtPages - 1;
             if(currentPage < 0) currentPage = 0;
 
@@ -526,13 +516,9 @@
         const width = window.innerWidth;
         const x = e.clientX;
         
-        if (x < width * 0.23) {
-            prevPage();
-        } else if (x > width * 0.77) {
-            nextPage();
-        } else {
-            controlHub.classList.toggle('active');
-        }
+        if (x < width * 0.23) { prevPage(); } 
+        else if (x > width * 0.77) { nextPage(); } 
+        else { controlHub.classList.toggle('active'); }
     });
 
     document.getElementById('btnCloseHub').addEventListener('click', (e) => {
@@ -540,22 +526,16 @@
         controlHub.classList.remove('active');
     });
 
-    // SISTEMA FULLSCREEN CORRIGIDO: Alveja o documentElement para blindar contra Font Boosting mobile
+    // SISTEMA INTECOUTÁVEL DE FULLSCREEN COM ALVO NA RAIZ DO DOCUMENTO
     btnFullscreen.addEventListener('click', (e) => {
         e.stopPropagation();
         const target = document.documentElement; 
         if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-            if (target.requestFullscreen) {
-                target.requestFullscreen();
-            } else if (target.webkitRequestFullscreen) {
-                target.webkitRequestFullscreen();
-            }
+            if (target.requestFullscreen) { target.requestFullscreen(); } 
+            else if (target.webkitRequestFullscreen) { target.webkitRequestFullscreen(); }
         } else {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.webkitExitFullscreen) {
-                document.webkitExitFullscreen();
-            }
+            if (document.exitFullscreen) { document.exitFullscreen(); } 
+            else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
         }
     });
 
@@ -576,7 +556,7 @@
                 render();
             }
         };
-        setTimeout(recalculate, 100);
+        setTimeout(recalculate, 150);
     }
     document.addEventListener('fullscreenchange', monitorFullscreen);
     document.addEventListener('webkitfullscreenchange', monitorFullscreen);
@@ -698,12 +678,9 @@
         if(library.length === 0) { list.innerHTML = '<div style="text-align:center;padding:20px;font-size:12px;opacity:0.5;">Sua estante está vazia.</div>'; return; }
         
         library.forEach(book => {
-            const row = document.createElement('div');
-            row.className = 'panel-item';
-            
+            const row = document.createElement('div'); row.className = 'panel-item';
             const infoArea = document.createElement('div');
-            infoArea.style.flexGrow = '1';
-            infoArea.style.cursor = 'pointer';
+            infoArea.style.flexGrow = '1'; infoArea.style.cursor = 'pointer';
             infoArea.innerHTML = `<strong>${book.title}</strong> <span style="font-size:10px; opacity:0.6; display:block;">Tipo: ${book.isPDF ? 'PDF':'TEXTO'}</span>`;
             
             infoArea.addEventListener('click', () => {
@@ -716,13 +693,11 @@
                             const typedarray = new Uint8Array(arrayBuffer);
                             pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
                                 currentBook = { id: book.id, title: book.title, text: "", pages: [], isPDF: true, pdfDoc: pdf, totalPages: pdf.numPages };
-                                currentPage = savedProgress;
-                                pdfZoom = 1.0;
-                                render();
-                            }).catch(() => alert("Erro ao carregar o PDF do banco de dados local."));
+                                currentPage = savedProgress; pdfZoom = 1.0; render();
+                            }).catch(() => alert("Erro ao carregar o PDF."));
                         } else {
                             pendingPdfLoadingId = book.id;
-                            alert("Por segurança, selecione o arquivo original deste PDF uma última vez para migrá-lo ao novo banco permanente.");
+                            alert("Por segurança, selecione o arquivo original deste PDF uma última vez para migrá-lo.");
                             fileInput.click();
                         }
                     });
@@ -730,34 +705,25 @@
                     const savedText = safeStorage.getItem(DB_PREFIX + 'book_data_' + book.id) || "";
                     currentBook = { id: book.id, title: book.title, text: savedText, pages: [], isPDF: false, pdfDoc: null, totalPages: 0 };
                     currentBook.pages = paginateText(savedText);
-                    currentPage = savedProgress;
-                    render();
+                    currentPage = savedProgress; render();
                 }
             });
 
             const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'delete-btn';
-            deleteBtn.innerHTML = '🗑️';
+            deleteBtn.className = 'delete-btn'; deleteBtn.innerHTML = '🗑️';
             deleteBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                if (confirm(`Deseja apagar permanentemente "${book.title}" da sua estante?`)) {
+                if (confirm(`Deseja apagar "${book.title}"?`)) {
                     library = library.filter(b => b.id !== book.id);
                     safeStorage.setItem(DB_PREFIX + 'library_meta', JSON.stringify(library));
                     safeStorage.removeItem(DB_PREFIX + 'book_data_' + book.id);
                     safeStorage.removeItem(DB_PREFIX + 'progress_' + book.id);
                     if (book.isPDF) deletePDFFromDB(book.id);
-                    
-                    if (currentBook && currentBook.id === book.id) {
-                        document.getElementById('btnLoadDefault').click();
-                    } else {
-                        buildLibraryUI();
-                    }
+                    if (currentBook && currentBook.id === book.id) { document.getElementById('btnLoadDefault').click(); } else { buildLibraryUI(); }
                 }
             });
 
-            row.appendChild(infoArea);
-            row.appendChild(deleteBtn);
-            list.appendChild(row);
+            row.appendChild(infoArea); row.appendChild(deleteBtn); list.appendChild(row);
         });
     }
 
@@ -773,7 +739,7 @@
         closePanels();
         const list = document.getElementById('bookmarksList'); list.innerHTML = '';
         const bookKey = currentBook.title || "default";
-        if (!bookmarks[bookKey] || bookmarks[bookKey].length === 0) { list.innerHTML = '<div style="text-align:center;padding:20px;font-size:12px;opacity:0.5;">Nenhum marcador neste livro.</div>'; } 
+        if (!bookmarks[bookKey] || bookmarks[bookKey].length === 0) { list.innerHTML = '<div style="text-align:center;padding:20px;font-size:12px;opacity:0.5;">Nenhum marcador.</div>'; } 
         else {
             bookmarks[bookKey].forEach(pIdx => {
                 const row = document.createElement('div'); row.className = 'panel-item'; row.innerText = `Página ${pIdx + 1}`;
@@ -811,12 +777,9 @@
                                     pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
                                         currentBook = { id: found.id, title: found.title, text: "", pages: [], isPDF: true, pdfDoc: pdf, totalPages: pdf.numPages };
                                         currentPage = parseInt(safeStorage.getItem(DB_PREFIX + 'progress_' + found.id) || "0", 10);
-                                        pdfZoom = 1.0;
-                                        render();
+                                        pdfZoom = 1.0; render();
                                     });
-                                } else {
-                                    document.getElementById('btnLoadDefault').click();
-                                }
+                                } else { document.getElementById('btnLoadDefault').click(); }
                             });
                             return;
                         } else {
@@ -825,8 +788,7 @@
                                 currentBook = { id: found.id, title: found.title, text: textData, pages: [], isPDF: false, pdfDoc: null, totalPages: 0 };
                                 currentBook.pages = paginateText(textData);
                                 currentPage = parseInt(safeStorage.getItem(DB_PREFIX + 'progress_' + found.id) || "0", 10);
-                                render();
-                                return;
+                                render(); return;
                             }
                         }
                     }
