@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <!-- TAGS SUPREMAS: Permitem transformar o arquivo em App nativo sem barras ao "Adicionar à Tela Inicial" -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
@@ -65,6 +64,18 @@
             transition: background-color 0.25s, color 0.25s;
         }
 
+        /* Correção Crítica: Forçar estabilidade quando o elemento entra em modo Fullscreen nativo */
+        .screen:fullscreen {
+            width: 100% !important;
+            height: 100% !important;
+            padding: 12px 16px !important;
+        }
+        .screen:-webkit-full-screen {
+            width: 100% !important;
+            height: 100% !important;
+            padding: 12px 16px !important;
+        }
+
         .screen.light { background-color: var(--screen-light); color: var(--text-light); --accent-bar: #2563eb; }
         .screen.dark { background-color: var(--screen-dark); color: var(--text-dark); --accent-bar: #94a3b8; }
         .screen.sepia { background-color: var(--screen-sepia); color: var(--text-sepia); --accent-bar: #b45309; }
@@ -87,7 +98,7 @@
         .bookmark-icon { font-size: 16px; cursor: pointer; padding: 0 6px; }
         .bookmark-icon.active { color: #e53e3e; }
 
-        /* Motor de Layout de Texto E-Reader Pro (BARRA LATERAL REMOVIDA) */
+        /* Motor de Layout de Texto E-Reader Pro */
         .book-content {
             flex-grow: 1;
             flex-shrink: 1;
@@ -96,20 +107,17 @@
             font-size: 17px;
             line-height: 1.6;
             text-align: justify;
-            overflow: hidden !important; /* Esconde a rolagem por completo */
+            overflow: hidden !important; 
             white-space: pre-wrap;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
             align-items: center;
             -webkit-overflow-scrolling: touch;
-            
-            /* Bloqueio extra anti-scrollbar para Firefox e Edge */
             -ms-overflow-style: none;  
             scrollbar-width: none;  
         }
 
-        /* Bloqueio definitivo de scrollbar para Chrome, Safari e Opera */
         .book-content::-webkit-scrollbar {
             display: none !important;
             width: 0 !important;
@@ -165,18 +173,23 @@
         .control-hub.active { transform: translate(-50%, 0); opacity: 1; visibility: visible; }
         .control-row { display: flex; justify-content: space-between; align-items: center; gap: 6px; width: 100%; }
 
+        /* Correção de Layout nos Botões: Impedir estouro e permitir quebra de linha controlada */
         .btn {
             flex: 1; background-color: #f1f5f9; border: 1px solid #cbd5e1; color: #334155;
             padding: 10px 4px; border-radius: 8px; cursor: pointer; font-size: 12px;
-            font-weight: 600; text-align: center; white-space: nowrap;
+            font-weight: 600; text-align: center;
+            white-space: normal; 
+            min-width: 0;
+            display: flex; align-items: center; justify-content: center;
         }
         .btn-prime { background-color: #2563eb; color: white; border: none; }
-        .file-upload-wrapper { position: relative; overflow: hidden; flex: 1; display: flex; }
+        .file-upload-wrapper { position: relative; overflow: hidden; flex: 1; display: flex; min-width: 0; }
         .file-upload-wrapper input[type=file] { position: absolute; left: 0; top: 0; opacity: 0; height: 100%; width: 100%; cursor: pointer; }
 
         select {
             padding: 8px 4px; border-radius: 8px; border: 1px solid #cbd5e1;
             background: white; font-size: 12px; flex: 1; color: #334155; height: 36px;
+            min-width: 0;
         }
 
         /* REGRAS EXCLUSIVAS PARA TELAS EM MODO HORIZONTAL (PAISAGEM) */
@@ -242,7 +255,6 @@
 
 <div class="overlay" id="uiOverlay"></div>
 
-<!-- PAINEL DE CONTROLE -->
 <div class="control-hub" id="controlHub">
     <div class="control-row" style="border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; margin-bottom: 2px;">
         <span style="font-weight: bold; font-size: 13px; color: #64748b;">Configurações do Leitor</span>
@@ -278,7 +290,6 @@
         </select>
     </div>
 
-    <!-- LINHA DE TEMA E TELA CHEIA INTEGRADOS -->
     <div class="control-row">
         <select id="selectTheme" style="flex: 1;">
             <option value="light">Modo Claro (Alvo)</option>
@@ -522,14 +533,15 @@
         controlHub.classList.remove('active');
     });
 
-    // MOTOR DO SISTEMA DE TELA CHEIA (FULLSCREEN API)
+    // CORREÇÃO CRÍTICA DO MOTOR DE TELA CHEIA (FOCANDO NO ELEMENTO DA TELA E NÃO NO DOCUMENTO)
     btnFullscreen.addEventListener('click', (e) => {
         e.stopPropagation();
+        const target = document.getElementById('globalBody'); 
         if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-            if (document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen();
-            } else if (document.documentElement.webkitRequestFullscreen) {
-                document.documentElement.webkitRequestFullscreen();
+            if (target.requestFullscreen) {
+                target.requestFullscreen();
+            } else if (target.webkitRequestFullscreen) {
+                target.webkitRequestFullscreen();
             }
         } else {
             if (document.exitFullscreen) {
@@ -548,12 +560,18 @@
             btnFullscreen.innerText = "📺 Tela Cheia";
             btnFullscreen.style.backgroundColor = "#e2e8f0";
         }
-        setTimeout(() => {
+        
+        // Multi-stage checks para garantir que a paginação só rode após o celular estabilizar o novo tamanho
+        const recalculate = () => {
             if (currentBook && !currentBook.isPDF && currentBook.text) {
                 currentBook.pages = paginateText(currentBook.text);
                 render();
+            } else if (currentBook && currentBook.isPDF) {
+                render();
             }
-        }, 150);
+        };
+        setTimeout(recalculate, 80);
+        setTimeout(recalculate, 250); 
     }
     document.addEventListener('fullscreenchange', monitorFullscreen);
     document.addEventListener('webkitfullscreenchange', monitorFullscreen);
