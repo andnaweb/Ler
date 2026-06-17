@@ -10,10 +10,20 @@
     
     <title>Kindle OS - Ultimate World Edition</title>
     
+    <!-- Captura preventiva caso o script externo do PDF seja bloqueado pelo servidor online -->
+    <script>
+        window.pdfjsLoadError = false;
+        window.addEventListener('error', function(e) {
+            if (e.target && e.target.src && e.target.src.includes('pdf.js')) {
+                window.pdfjsLoadError = true;
+                showMobileDebug("Erro Crítico: O servidor online bloqueou o carregador de PDFs (CORS/CSP).");
+            }
+        }, true);
+    </script>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     
     <style>
-        /* BLOQUEIO ABSOLUTO DE COMPORTAMENTOS PARASITAS DE NAVEGADORES MOBILE */
         html, body {
             width: 100% !important;
             height: 100% !important;
@@ -24,10 +34,9 @@
             top: 0; left: 0; right: 0; bottom: 0;
             background-color: #111;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            overscroll-behavior: none !important; /* Impede o pull-to-refresh do Chrome/Safari */
+            overscroll-behavior: none !important;
         }
 
-        /* Trava Definitiva Antifont-Boosting em Cascata Global */
         html, body, div, span, button, select, option, input, *, *::before, *::after {
             box-sizing: border-box;
             max-height: 999999px !important; 
@@ -48,7 +57,6 @@
             --accent-bar: #2563eb;
         }
 
-        /* Container da Tela Ocupando Exatamente 100% do Viewport Físico */
         .screen {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -65,7 +73,6 @@
         .screen.dark { background-color: var(--screen-dark); color: var(--text-dark); --accent-bar: #94a3b8; }
         .screen.sepia { background-color: var(--screen-sepia); color: var(--text-sepia); --accent-bar: #b45309; }
 
-        /* Barras Informativas */
         .top-bar, .footer-bar {
             flex-shrink: 0;
             height: 26px;
@@ -83,7 +90,6 @@
         .bookmark-icon { font-size: 16px; cursor: pointer; padding: 0 6px; }
         .bookmark-icon.active { color: #e53e3e; }
 
-        /* Motor de Layout de Texto E-Reader Pro */
         .book-content {
             flex-grow: 1;
             flex-shrink: 1;
@@ -102,117 +108,59 @@
         }
 
         .book-content div { width: 100%; }
-        
-        .book-content canvas { 
-            display: block; 
-            margin: 0 auto; 
-            max-width: none !important;  
-            max-height: none !important;
-            object-fit: contain; 
-        }
+        .book-content canvas { display: block; margin: 0 auto; max-width: none !important; max-height: none !important; object-fit: contain; }
 
-        /* Barra de Progresso Visual Premium */
         .progress-track {
-            width: 100%;
-            height: 3px;
-            background: rgba(0,0,0,0.06);
-            flex-shrink: 0;
-            margin-top: auto;
-            margin-bottom: 2px;
-            border-radius: 2px;
-            overflow: hidden;
+            width: 100%; height: 3px; background: rgba(0,0,0,0.06); flex-shrink: 0; margin-top: auto; margin-bottom: 2px; border-radius: 2px; overflow: hidden;
         }
         .screen.dark .progress-track { background: rgba(255,255,255,0.1); }
-        .progress-bar-fill {
-            width: 0%;
-            height: 100%;
-            background: var(--accent-bar);
-            transition: width 0.25s ease;
-        }
+        .progress-bar-fill { width: 0%; height: 100%; background: var(--accent-bar); transition: width 0.25s ease; }
 
-        /* PAINEL DE CONTROLE ULTRA-RESPONSIVO ANTI-QUEBRA DE MATRIZ */
+        /* PAINEL DE CONTROLE ALTAMENTE ESTÁVEL */
         .control-hub {
             position: fixed;
             bottom: calc(12px + env(safe-area-inset-bottom, 0px)); 
-            /* Sistema de Centralização Física Imune a Bugs de Subpixel Mobile */
-            left: 12px;
-            right: 12px;
-            margin: 0 auto;
-            width: calc(100% - 24px);
-            max-width: 400px;
-            
+            left: 12px; right: 12px; margin: 0 auto;
+            width: calc(100% - 24px); max-width: 400px;
             max-height: calc(100% - 30px);
             overflow-y: auto;
-            background: rgba(255, 255, 255, 0.98);
-            border: 1px solid #cbd5e1;
-            padding: 14px; 
-            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.98); border: 1px solid #cbd5e1;
+            padding: 14px; border-radius: 16px;
             box-shadow: 0 12px 40px rgba(0,0,0,0.3);
-            display: flex; 
-            flex-direction: column; 
-            gap: 10px;
-            z-index: 100; 
-            opacity: 0; 
-            visibility: hidden;
-            
-            /* Transição baseada estritamente no eixo Y (Vertical) para não conflitar com as laterais */
+            display: flex; flex-direction: column; gap: 10px;
+            z-index: 100; opacity: 0; visibility: hidden;
             transform: translateY(120%);
             transition: transform 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.1), opacity 0.2s, visibility 0.2s;
             color: #334155;
             overscroll-behavior: contain;
         }
-        /* Quando ativo, apenas zera a transição vertical, mantendo o alinhamento horizontal intacto */
         .control-hub.active { transform: translateY(0); opacity: 1; visibility: visible; }
         
-        .control-row { 
-            display: flex; 
-            flex-wrap: wrap; 
-            justify-content: space-between; 
-            align-items: center; 
-            gap: 8px; 
-            width: 100%; 
-        }
+        .control-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; width: 100%; }
 
         .btn {
-            flex: 1 1 calc(50% - 4px); 
-            background-color: #f1f5f9; border: 1px solid #cbd5e1; color: #334155;
+            flex: 1 1 calc(50% - 4px); background-color: #f1f5f9; border: 1px solid #cbd5e1; color: #334155;
             padding: 10px 6px; border-radius: 8px; cursor: pointer; font-size: 12px;
-            font-weight: 600; text-align: center; white-space: nowrap;
-            min-width: 110px;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            font-weight: 600; text-align: center; white-space: nowrap; min-width: 110px;
+            overflow: hidden; text-overflow: ellipsis;
         }
         .btn-prime { background-color: #2563eb; color: white; border: none; }
         
-        .file-upload-wrapper { 
-            position: relative; 
-            overflow: hidden; 
-            flex: 1 1 calc(50% - 4px); 
-            display: flex; 
-            min-width: 110px;
-        }
+        .file-upload-wrapper { position: relative; overflow: hidden; flex: 1 1 calc(50% - 4px); display: flex; min-width: 110px; }
         .file-upload-wrapper input[type=file] { position: absolute; left: 0; top: 0; opacity: 0; height: 100%; width: 100%; cursor: pointer; }
 
         select {
             padding: 8px 6px; border-radius: 8px; border: 1px solid #cbd5e1;
-            background: white; font-size: 12px; flex: 1 1 calc(50% - 4px); color: #334155; height: 36px;
-            min-width: 110px;
+            background: white; font-size: 12px; flex: 1 1 calc(50% - 4px); color: #334155; height: 36px; min-width: 110px;
         }
 
-        /* Ajustes de Segurança Extras para Modo Paisagem (Telas Deitadas) */
         @media (max-height: 520px) {
-            .control-hub {
-                bottom: 4px;
-                padding: 10px;
-                gap: 6px;
-                border-radius: 12px;
-            }
+            .control-hub { bottom: 4px; padding: 10px; gap: 6px; border-radius: 12px; }
             .control-row { gap: 6px; }
             .btn { padding: 8px 4px; font-size: 11px; min-width: 95px; }
             select { height: 32px; font-size: 11px; padding: 4px; min-width: 95px; }
         }
 
-        /* Gavetas Modais Laterais */
         .side-panel {
             position: fixed; top: 0; bottom: 0; left: 0;
             width: 86%; max-width: 300px; background: white;
@@ -225,21 +173,40 @@
         .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; }
         .panel-list { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
         
-        .panel-item { 
-            padding: 10px 12px; background: #f8fafc; border: 1px solid #e2e8f0; 
-            border-radius: 8px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; 
-        }
-        .delete-btn {
-            background: none; border: none; padding: 6px; cursor: pointer; font-size: 14px;
-            border-radius: 6px; transition: background 0.2s;
-        }
+        .panel-item { padding: 10px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; }
+        .delete-btn { background: none; border: none; padding: 6px; cursor: pointer; font-size: 14px; border-radius: 6px; transition: background 0.2s; }
         .delete-btn:active { background: #fee2e2; }
         
         .overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.45); z-index: 50; display: none; }
         .overlay.active { display: block; }
+
+        /* SISTEMA VISUAL DE DIAGNÓSTICO MOBILE */
+        #mobileDebuggerBtn {
+            position: fixed; top: 35px; left: 5%; right: 5%; width: 90%;
+            background: #ef4444; color: white; text-align: center;
+            padding: 12px; font-weight: bold; font-size: 14px; border-radius: 8px;
+            z-index: 9999; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            animation: pulse 2s infinite;
+        }
+        #mobileDebuggerConsole {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #1e293b; color: #f1f5f9; padding: 20px; font-family: monospace;
+            font-size: 12px; z-index: 10000; overflow-y: auto; display: none;
+        }
+        @keyframes pulse { 0% { opacity: 0.9; } 50% { opacity: 1; } 100% { opacity: 0.9; } }
     </style>
 </head>
 <body>
+
+<!-- Elementos Invisíveis do Diagnóstico Mobile -->
+<div id="mobileDebuggerBtn" onclick="openMobileConsole()">⚠️ Ver Erro do Celular</div>
+<div id="mobileDebuggerConsole">
+    <h3 style="color:#f43f5e; margin-top:0;">Relatório de Erros do Navegador Mobile</h3>
+    <p>Copie as linhas abaixo para me enviar:</p>
+    <hr style="border-color:#334155;">
+    <div id="mobileDebugList"></div>
+    <button class="btn" onclick="closeMobileConsole()" style="margin-top:20px; width:100%; background:#3b82f6; color:white; border:none;">Fechar Painel</button>
+</div>
 
 <div class="screen sepia" id="globalBody">
     <div class="top-bar">
@@ -328,47 +295,85 @@
 </div>
 
 <script>
-    // --- BANCO DE DADOS INDEXEDDB PARA ARQUIVOS SENSÍVEIS (PDFs) ---
+    // --- MOTOR INTELIGENTE DE CAPTURA DE ERROS MOBILE ---
+    const debugList = document.getElementById("mobileDebugList");
+    function showMobileDebug(text) {
+        document.getElementById("mobileDebuggerBtn").style.display = "block";
+        const entry = document.createElement("div");
+        entry.style.padding = "6px 0";
+        entry.style.borderBottom = "1px solid #334155";
+        entry.innerHTML = `[${new Date().toLocaleTimeString()}] ${text}`;
+        debugList.appendChild(entry);
+    }
+    window.onerror = function(msg, url, line) {
+        showMobileDebug(`Erro global: ${msg} na linha ${line}`);
+        return false;
+    };
+    window.onunhandledrejection = function(event) {
+        showMobileDebug(`Promessa Rejeitada: ${event.reason}`);
+    };
+    function openMobileConsole() { document.getElementById("mobileDebuggerConsole").style.display = "block"; }
+    function closeMobileConsole() { document.getElementById("mobileDebuggerConsole").style.display = "none"; }
+
+    // --- BANCO DE DADOS INDEXEDDB ---
     const DB_NAME = "KindleOS_Storage_DB";
     let localDB = null;
-    const dbRequest = indexedDB.open(DB_NAME, 1);
     
-    dbRequest.onupgradeneeded = function(e) {
-        let db = e.target.result;
-        if (!db.objectStoreNames.contains("pdf_files")) {
-            db.createObjectStore("pdf_files");
-        }
-    };
-    dbRequest.onsuccess = function(e) { localDB = e.target.result; };
+    try {
+        const dbRequest = indexedDB.open(DB_NAME, 1);
+        dbRequest.onupgradeneeded = function(e) {
+            let db = e.target.result;
+            if (!db.objectStoreNames.contains("pdf_files")) {
+                db.createObjectStore("pdf_files");
+            }
+        };
+        dbRequest.onsuccess = function(e) { localDB = e.target.result; };
+        dbRequest.onerror = function(e) {
+            showMobileDebug("IndexedDB bloqueado pelo navegador online (Segurança/SSL).");
+        };
+    } catch(err) {
+        showMobileDebug("Erro ao tentar inicializar IndexedDB online: " + err.message);
+    }
 
     function storePDFInDB(id, arrayBuffer) {
         if (!localDB) return;
-        const tx = localDB.transaction("pdf_files", "readwrite");
-        tx.objectStore("pdf_files").put(arrayBuffer, id);
+        try {
+            const tx = localDB.transaction("pdf_files", "readwrite");
+            tx.objectStore("pdf_files").put(arrayBuffer, id);
+        } catch(e) { showMobileDebug("Erro ao salvar PDF no banco: " + e.message); }
     }
 
     function getPDFFromDB(id, callback) {
         if (!localDB) { callback(null); return; }
-        const tx = localDB.transaction("pdf_files", "readonly");
-        const req = tx.objectStore("pdf_files").get(id);
-        req.onsuccess = function() { callback(req.result || null); };
-        req.onerror = function() { callback(null); };
+        try {
+            const tx = localDB.transaction("pdf_files", "readonly");
+            const req = tx.objectStore("pdf_files").get(id);
+            req.onsuccess = function() { callback(req.result || null); };
+            req.onerror = function() { callback(null); };
+        } catch(e) { callback(null); }
     }
 
     function deletePDFFromDB(id) {
         if (!localDB) return;
-        const tx = localDB.transaction("pdf_files", "readwrite");
-        tx.objectStore("pdf_files").delete(id);
+        try {
+            const tx = localDB.transaction("pdf_files", "readwrite");
+            tx.objectStore("pdf_files").delete(id);
+        } catch(e) {}
     }
 
     if (typeof pdfjsLib !== 'undefined') {
         try { pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js'; } catch(e) {}
+    } else {
+        setTimeout(() => {
+            if (typeof pdfjsLib === 'undefined') {
+                showMobileDebug("Falha: Biblioteca PDF.js não pôde ser carregada remotamente.");
+            }
+        }, 1000);
     }
 
     const defaultBookText = `Dom Casmurro\n\nCapítulo 1 - Do título\n\nUma noite destes, vindo da cidade para o Engenho Novo, encontrei no trem da Central um rapaz aqui do bairro, que eu conheço de vista e de chapéu. Cumprimentou-me, sentou-se ao pé de mim, falou da lua e dos ministros, e acabou recitando-me versos. O trem seguiu, os versos continuaram, e a viagem parecia-me cada vez mais longa. Como eu não souumesse os versos de cor, limitei-me a abanar a cabeça em sinal de aprovação, mas o rapaz notou a minha distração e parou magoado.`;
 
     const DB_PREFIX = "kindle_v8_ultimate_";
-
     const memoryStorage = {};
     const safeStorage = {
         getItem: function(key) { try { return localStorage.getItem(key); } catch(e) { return memoryStorage[key] || null; } },
@@ -408,7 +413,6 @@
         if (!text) return [" [Sem conteúdo estruturado] "];
         const pages = [];
         let index = 0;
-        
         let width = bookContent.clientWidth || window.innerWidth;
         let height = bookContent.clientHeight || window.innerHeight;
         
@@ -421,7 +425,6 @@
         
         const currentLineHeight = parseFloat(bookContent.style.lineHeight || "1.6");
         const spacingCompensation = 1.6 / currentLineHeight;
-        
         const adjustedCharCount = Math.max(140, Math.floor((baseChars - ((fontSize - 17) * 28)) * spacingCompensation));
 
         while (index < text.length) {
@@ -461,17 +464,16 @@
             currentBook.pdfDoc.getPage(currentPage + 1).then(function(page) {
                 const unscaledViewport = page.getViewport({ scale: 1 });
                 const containerW = bookContent.clientWidth || window.innerWidth;
-                
                 const baseScale = (containerW - 8) / unscaledViewport.width;
-                
                 const viewport = page.getViewport({ scale: baseScale * pdfZoom });
                 canvas.height = viewport.height;
                 canvas.width = viewport.width;
                 
                 const renderContext = { canvasContext: canvas.getContext('2d'), viewport: viewport };
                 page.render(renderContext);
-            }).catch(() => {
+            }).catch((err) => {
                 bookContent.innerHTML = `<div style="padding:20px; color:red; font-size:14px;">Erro de renderização gráfica. Reduza o Zoom.</div>`;
+                showMobileDebug("Erro render PDF: " + err.message);
             });
         } else {
             lblZoomType.innerText = `Texto ${fontSize}px`;
@@ -500,79 +502,38 @@
 
     function nextPage() {
         const max = currentBook.isPDF ? currentBook.totalPages : (currentBook.pages ? currentBook.pages.length : 1);
-        if (currentPage < max - 1) { 
-            currentPage++; 
-            render(); 
-            bookContent.scrollTop = 0;
-            bookContent.scrollLeft = 0;
-        }
+        if (currentPage < max - 1) { currentPage++; render(); bookContent.scrollTop = 0; bookContent.scrollLeft = 0; }
     }
-    
     function prevPage() {
-        if (currentPage > 0) { 
-            currentPage--; 
-            render(); 
-            bookContent.scrollTop = 0;
-            bookContent.scrollLeft = 0;
-        }
+        if (currentPage > 0) { currentPage--; render(); bookContent.scrollTop = 0; bookContent.scrollLeft = 0; }
     }
 
     globalBody.addEventListener('click', (e) => {
-        if (e.target.closest('.top-bar') || 
-            e.target.closest('.footer-bar') || 
-            e.target.closest('.control-hub') || 
-            e.target.closest('.side-panel') || 
-            e.target.closest('.btn') ||
-            e.target.id === 'fileInput') return;
-        
-        const width = window.innerWidth;
-        const x = e.clientX;
-        
-        if (x < width * 0.23) {
-            prevPage();
-        } else if (x > width * 0.77) {
-            nextPage();
-        } else {
-            controlHub.classList.toggle('active');
-        }
+        if (e.target.closest('.top-bar') || e.target.closest('.footer-bar') || e.target.closest('.control-hub') || e.target.closest('.side-panel') || e.target.closest('.btn') || e.target.id === 'fileInput' || e.target.id === 'mobileDebuggerBtn') return;
+        const width = window.innerWidth; const x = e.clientX;
+        if (x < width * 0.23) { prevPage(); } else if (x > width * 0.77) { nextPage(); } else { controlHub.classList.toggle('active'); }
     });
 
-    document.getElementById('btnCloseHub').addEventListener('click', (e) => {
-        e.stopPropagation();
-        controlHub.classList.remove('active');
-    });
+    document.getElementById('btnCloseHub').addEventListener('click', (e) => { e.stopPropagation(); controlHub.classList.remove('active'); });
 
     btnFullscreen.addEventListener('click', (e) => {
         e.stopPropagation();
         if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-            if (document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen();
-            } else if (document.documentElement.webkitRequestFullscreen) {
-                document.documentElement.webkitRequestFullscreen();
-            }
+            if (document.documentElement.requestFullscreen) { document.documentElement.requestFullscreen(); } 
+            else if (document.documentElement.webkitRequestFullscreen) { document.documentElement.webkitRequestFullscreen(); }
         } else {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.webkitExitFullscreen) {
-                document.webkitExitFullscreen();
-            }
+            if (document.exitFullscreen) { document.exitFullscreen(); } 
+            else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
         }
     });
 
     function monitorFullscreen() {
         if (document.fullscreenElement || document.webkitFullscreenElement) {
-            btnFullscreen.innerText = "📺 Sair do Fullscreen";
-            btnFullscreen.style.backgroundColor = "#cbd5e1";
+            btnFullscreen.innerText = "📺 Sair do Fullscreen"; btnFullscreen.style.backgroundColor = "#cbd5e1";
         } else {
-            btnFullscreen.innerText = "📺 Tela Cheia";
-            btnFullscreen.style.backgroundColor = "#e2e8f0";
+            btnFullscreen.innerText = "📺 Tela Cheia"; btnFullscreen.style.backgroundColor = "#e2e8f0";
         }
-        setTimeout(() => {
-            if (currentBook && !currentBook.isPDF && currentBook.text) {
-                currentBook.pages = paginateText(currentBook.text);
-                render();
-            }
-        }, 150);
+        setTimeout(() => { if (currentBook && !currentBook.isPDF && currentBook.text) { currentBook.pages = paginateText(currentBook.text); render(); } }, 150);
     }
     document.addEventListener('fullscreenchange', monitorFullscreen);
     document.addEventListener('webkitfullscreenchange', monitorFullscreen);
@@ -587,8 +548,7 @@
     }
 
     btnBookmark.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const bookKey = currentBook.title || "default";
+        e.stopPropagation(); const bookKey = currentBook.title || "default";
         if (!bookmarks[bookKey]) bookmarks[bookKey] = [];
         const idx = bookmarks[bookKey].indexOf(currentPage);
         if (idx > -1) { bookmarks[bookKey].splice(idx, 1); } else { bookmarks[bookKey].push(currentPage); bookmarks[bookKey].sort((a, b) => a - b); }
@@ -597,19 +557,12 @@
     });
 
     uiOverlay.addEventListener('click', closePanels);
-
-    function closePanels() {
-        controlHub.classList.remove('active');
-        document.getElementById('panelLibrary').classList.remove('active');
-        document.getElementById('panelBookmarks').classList.remove('active');
-        uiOverlay.classList.remove('active');
-    }
+    function closePanels() { controlHub.classList.remove('active'); document.getElementById('panelLibrary').classList.remove('active'); document.getElementById('panelBookmarks').classList.remove('active'); uiOverlay.classList.remove('active'); }
 
     document.getElementById('btnFontPlus').addEventListener('click', () => {
         if (currentBook.isPDF) { pdfZoom = Math.min(3.0, pdfZoom + 0.15); render(); } 
         else if (fontSize < 28) { fontSize += 1; bookContent.style.fontSize = fontSize + 'px'; currentBook.pages = paginateText(currentBook.text); render(); }
     });
-
     document.getElementById('btnFontMinus').addEventListener('click', () => {
         if (currentBook.isPDF) { pdfZoom = Math.max(0.6, pdfZoom - 0.15); render(); } 
         else if (fontSize > 13) { fontSize -= 1; bookContent.style.fontSize = fontSize + 'px'; currentBook.pages = paginateText(currentBook.text); render(); }
@@ -617,17 +570,158 @@
 
     document.getElementById('selectFont').addEventListener('change', (e) => { if(!currentBook.isPDF) bookContent.style.fontFamily = e.target.value; });
     document.getElementById('selectTheme').addEventListener('change', (e) => { globalBody.className = 'screen ' + e.target.value; });
-    
-    document.getElementById('selectSpacing').addEventListener('change', (e) => {
-        bookContent.style.lineHeight = e.target.value;
-        if(!currentBook.isPDF) { currentBook.pages = paginateText(currentBook.text); render(); }
-    });
+    document.getElementById('selectSpacing').addEventListener('change', (e) => { bookContent.style.lineHeight = e.target.value; if(!currentBook.isPDF) { currentBook.pages = paginateText(currentBook.text); render(); } });
 
-    window.addEventListener('resize', () => {
-        if (!currentBook.isPDF && currentBook.text) { currentBook.pages = paginateText(currentBook.text); }
-        render();
-    });
+    window.addEventListener('resize', () => { if (!currentBook.isPDF && currentBook.text) { currentBook.pages = paginateText(currentBook.text); } render(); });
 
     fileInput.addEventListener('change', (e) => {
         const file = e.target.files[0]; if (!file) return;
         const titleClean = file.name.replace(/\.[^/.]+$/, "");
+        closePanels();
+
+        if (file.type === "application/pdf" || file.name.endsWith(".pdf")) {
+            if (typeof pdfjsLib === 'undefined') { alert("Motor de PDF indisponível online."); return; }
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const typedarray = new Uint8Array(evt.target.result);
+                pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
+                    if (pendingPdfLoadingId) {
+                        currentPage = parseInt(safeStorage.getItem(DB_PREFIX + 'progress_' + pendingPdfLoadingId) || "0", 10);
+                        currentBook = { id: pendingPdfLoadingId, title: titleClean, text: "", pages: [], isPDF: true, pdfDoc: pdf, totalPages: pdf.numPages };
+                        storePDFInDB(pendingPdfLoadingId, evt.target.result); pendingPdfLoadingId = null;
+                    } else {
+                        const newId = "pdf_" + Date.now();
+                        currentBook = { id: newId, title: titleClean, text: "", pages: [], isPDF: true, pdfDoc: pdf, totalPages: pdf.numPages };
+                        currentPage = 0; saveToLibraryMetadata(newId, titleClean, true); storePDFInDB(newId, evt.target.result);
+                    }
+                    pdfZoom = 1.0; render();
+                }).catch(err => showMobileDebug("Erro ao ler estrutura PDF: " + err.message));
+            };
+            reader.readAsArrayBuffer(file);
+        } else {
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                let textContent = evt.target.result;
+                if (file.name.endsWith(".html") || file.name.endsWith(".htm")) {
+                    const parser = new DOMParser(); const doc = parser.parseFromString(evt.target.result, 'text/html');
+                    textContent = doc.body.innerText || doc.body.textContent || "";
+                }
+                const newId = "txt_" + Date.now();
+                currentBook = { id: newId, title: titleClean, text: textContent, pages: [], isPDF: false, pdfDoc: null, totalPages: 0 };
+                currentBook.pages = paginateText(textContent); currentPage = 0;
+                saveToLibraryMetadata(newId, titleClean, false, textContent); render();
+            };
+            reader.readAsText(file, 'UTF-8');
+        }
+    });
+
+    function saveToLibraryMetadata(id, title, isPDF, rawText = "") {
+        if (library.some(b => b.title === title)) return;
+        const item = { id: id, title: title, isPDF: isPDF }; library.push(item);
+        safeStorage.setItem(DB_PREFIX + 'library_meta', JSON.stringify(library));
+        if (!isPDF && rawText) { safeStorage.setItem(DB_PREFIX + 'book_data_' + id, rawText); }
+    }
+
+    function buildLibraryUI() {
+        const list = document.getElementById('libraryList'); list.innerHTML = '';
+        if(library.length === 0) { list.innerHTML = '<div style="text-align:center;padding:20px;font-size:12px;opacity:0.5;">Sua estante está vazia.</div>'; return; }
+        
+        library.forEach(book => {
+            const row = document.createElement('div'); row.className = 'panel-item';
+            const infoArea = document.createElement('div'); infoArea.style.flexGrow = '1'; infoArea.style.cursor = 'pointer';
+            infoArea.innerHTML = `<strong>${book.title}</strong> <span style="font-size:10px; opacity:0.6; display:block;">Tipo: ${book.isPDF ? 'PDF':'TEXTO'}</span>`;
+            
+            infoArea.addEventListener('click', () => {
+                closePanels(); const savedProgress = parseInt(safeStorage.getItem(DB_PREFIX + 'progress_' + book.id) || "0", 10);
+                if (book.isPDF) {
+                    getPDFFromDB(book.id, function(arrayBuffer) {
+                        if (arrayBuffer) {
+                            const typedarray = new Uint8Array(arrayBuffer);
+                            pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
+                                currentBook = { id: book.id, title: book.title, text: "", pages: [], isPDF: true, pdfDoc: pdf, totalPages: pdf.numPages };
+                                currentPage = savedProgress; pdfZoom = 1.0; render();
+                            }).catch(() => showMobileDebug("Erro ao remontar PDF da memória local."));
+                        } else {
+                            pendingPdfLoadingId = book.id; alert("Selecione o arquivo original deste PDF para restabelecer o banco."); fileInput.click();
+                        }
+                    });
+                } else {
+                    const savedText = safeStorage.getItem(DB_PREFIX + 'book_data_' + book.id) || "";
+                    currentBook = { id: book.id, title: book.title, text: savedText, pages: [], isPDF: false, pdfDoc: null, totalPages: 0 };
+                    currentBook.pages = paginateText(savedText); currentPage = savedProgress; render();
+                }
+            });
+
+            const deleteBtn = document.createElement('button'); deleteBtn.className = 'delete-btn'; deleteBtn.innerHTML = '🗑️';
+            deleteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (confirm(`Excluir "${book.title}"?`)) {
+                    library = library.filter(b => b.id !== book.id); safeStorage.setItem(DB_PREFIX + 'library_meta', JSON.stringify(library));
+                    safeStorage.removeItem(DB_PREFIX + 'book_data_' + book.id); safeStorage.removeItem(DB_PREFIX + 'progress_' + book.id);
+                    if (book.isPDF) deletePDFFromDB(book.id);
+                    if (currentBook && currentBook.id === book.id) { document.getElementById('btnLoadDefault').click(); } else { buildLibraryUI(); }
+                }
+            });
+            row.appendChild(infoArea); row.appendChild(deleteBtn); list.appendChild(row);
+        });
+    }
+
+    function saveReadingProgress() { if (currentBook && currentBook.id && currentBook.id !== "default") { safeStorage.setItem(DB_PREFIX + 'progress_' + currentBook.id, currentPage); safeStorage.setItem(DB_PREFIX + 'last_active_id', currentBook.id); } }
+
+    document.getElementById('btnOpenLibrary').addEventListener('click', () => { closePanels(); buildLibraryUI(); document.getElementById('panelLibrary').classList.add('active'); uiOverlay.classList.add('active'); });
+    document.getElementById('btnOpenBookmarks').addEventListener('click', () => {
+        closePanels(); const list = document.getElementById('bookmarksList'); list.innerHTML = ''; const bookKey = currentBook.title || "default";
+        if (!bookmarks[bookKey] || bookmarks[bookKey].length === 0) { list.innerHTML = '<div style="text-align:center;padding:20px;font-size:12px;opacity:0.5;">Sem marcadores.</div>'; } 
+        else {
+            bookmarks[bookKey].forEach(pIdx => {
+                const row = document.createElement('div'); row.className = 'panel-item'; row.innerText = `Página ${pIdx + 1}`;
+                row.addEventListener('click', () => { currentPage = pIdx; closePanels(); render(); }); list.appendChild(row);
+            });
+        }
+        document.getElementById('panelBookmarks').classList.add('active'); uiOverlay.classList.add('active');
+    });
+
+    document.getElementById('btnLoadDefault').addEventListener('click', () => {
+        currentBook = { id: "default", title: "Dom Casmurro", text: defaultBookText, pages: [], isPDF: false, pdfDoc: null, totalPages: 0 };
+        currentBook.pages = paginateText(defaultBookText); currentPage = 0; closePanels(); render();
+    });
+
+    window.addEventListener('load', () => {
+        try {
+            const savedLib = safeStorage.getItem(DB_PREFIX + 'library_meta'); const savedMarks = safeStorage.getItem(DB_PREFIX + 'bookmarks');
+            if (savedLib) library = JSON.parse(savedLib); if (savedMarks) bookmarks = JSON.parse(savedMarks);
+        } catch(e) {}
+        setTimeout(() => {
+            try {
+                const lastId = safeStorage.getItem(DB_PREFIX + 'last_active_id');
+                if (lastId && lastId !== "default") {
+                    const found = library.find(b => b.id === lastId);
+                    if (found) {
+                        if (found.isPDF) {
+                            getPDFFromDB(found.id, function(arrayBuffer) {
+                                if (arrayBuffer) {
+                                    const typedarray = new Uint8Array(arrayBuffer);
+                                    pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
+                                        currentBook = { id: found.id, title: found.title, text: "", pages: [], isPDF: true, pdfDoc: pdf, totalPages: pdf.numPages };
+                                        currentPage = parseInt(safeStorage.getItem(DB_PREFIX + 'progress_' + found.id) || "0", 10);
+                                        pdfZoom = 1.0; render();
+                                    });
+                                } else { document.getElementById('btnLoadDefault').click(); }
+                            }); return;
+                        } else {
+                            const textData = safeStorage.getItem(DB_PREFIX + 'book_data_' + found.id);
+                            if (textData) {
+                                currentBook = { id: found.id, title: found.title, text: textData, pages: [], isPDF: false, pdfDoc: null, totalPages: 0 };
+                                currentBook.pages = paginateText(textData); currentPage = parseInt(safeStorage.getItem(DB_PREFIX + 'progress_' + found.id) || "0", 10);
+                                render(); return;
+                            }
+                        }
+                    }
+                }
+            } catch(e) {}
+            document.getElementById('btnLoadDefault').click();
+        }, 150);
+    });
+</script>
+</body>
+</html>
