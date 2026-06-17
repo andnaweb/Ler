@@ -24,6 +24,7 @@
             top: 0; left: 0; right: 0; bottom: 0;
             background-color: #111;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            overscroll-behavior: none !important; /* Impede o pull-to-refresh do Chrome/Safari */
         }
 
         /* Trava Definitiva Antifont-Boosting em Cascata Global */
@@ -98,14 +99,6 @@
             justify-content: flex-start;
             align-items: center;
             -webkit-overflow-scrolling: touch;
-            -ms-overflow-style: none;  
-            scrollbar-width: none;  
-        }
-
-        .book-content::-webkit-scrollbar {
-            display: none !important;
-            width: 0 !important;
-            height: 0 !important;
         }
 
         .book-content div { width: 100%; }
@@ -137,25 +130,39 @@
             transition: width 0.25s ease;
         }
 
-        /* Painel de Controle Altamente Responsivo e Antiquebra */
+        /* PAINEL DE CONTROLE ULTRA-RESPONSIVO ANTI-QUEBRA DE MATRIZ */
         .control-hub {
             position: fixed;
-            bottom: 12px; left: 50%;
-            transform: translate(-50%, 130%);
-            width: 94%; max-width: 410px;
-            max-height: calc(100% - 24px);
+            bottom: calc(12px + env(safe-area-inset-bottom, 0px)); 
+            /* Sistema de Centralização Física Imune a Bugs de Subpixel Mobile */
+            left: 12px;
+            right: 12px;
+            margin: 0 auto;
+            width: calc(100% - 24px);
+            max-width: 400px;
+            
+            max-height: calc(100% - 30px);
             overflow-y: auto;
-            overflow-x: hidden;
             background: rgba(255, 255, 255, 0.98);
             border: 1px solid #cbd5e1;
-            padding: 14px; border-radius: 16px;
+            padding: 14px; 
+            border-radius: 16px;
             box-shadow: 0 12px 40px rgba(0,0,0,0.3);
-            display: flex; flex-direction: column; gap: 10px;
-            z-index: 100; opacity: 0; visibility: hidden;
-            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, visibility 0.2s;
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px;
+            z-index: 100; 
+            opacity: 0; 
+            visibility: hidden;
+            
+            /* Transição baseada estritamente no eixo Y (Vertical) para não conflitar com as laterais */
+            transform: translateY(120%);
+            transition: transform 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.1), opacity 0.2s, visibility 0.2s;
             color: #334155;
+            overscroll-behavior: contain;
         }
-        .control-hub.active { transform: translate(-50%, 0); opacity: 1; visibility: visible; }
+        /* Quando ativo, apenas zera a transição vertical, mantendo o alinhamento horizontal intacto */
+        .control-hub.active { transform: translateY(0); opacity: 1; visibility: visible; }
         
         .control-row { 
             display: flex; 
@@ -167,34 +174,42 @@
         }
 
         .btn {
-            flex: 1 1 130px; 
+            flex: 1 1 calc(50% - 4px); 
             background-color: #f1f5f9; border: 1px solid #cbd5e1; color: #334155;
-            padding: 10px 4px; border-radius: 8px; cursor: pointer; font-size: 12px;
+            padding: 10px 6px; border-radius: 8px; cursor: pointer; font-size: 12px;
             font-weight: 600; text-align: center; white-space: nowrap;
-            min-width: 0;
+            min-width: 110px;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .btn-prime { background-color: #2563eb; color: white; border: none; }
-        .file-upload-wrapper { position: relative; overflow: hidden; flex: 1 1 130px; display: flex; }
+        
+        .file-upload-wrapper { 
+            position: relative; 
+            overflow: hidden; 
+            flex: 1 1 calc(50% - 4px); 
+            display: flex; 
+            min-width: 110px;
+        }
         .file-upload-wrapper input[type=file] { position: absolute; left: 0; top: 0; opacity: 0; height: 100%; width: 100%; cursor: pointer; }
 
         select {
-            padding: 8px 4px; border-radius: 8px; border: 1px solid #cbd5e1;
-            background: white; font-size: 12px; flex: 1 1 130px; color: #334155; height: 36px;
-            min-width: 0;
+            padding: 8px 6px; border-radius: 8px; border: 1px solid #cbd5e1;
+            background: white; font-size: 12px; flex: 1 1 calc(50% - 4px); color: #334155; height: 36px;
+            min-width: 110px;
         }
 
-        /* Otimizações Dinâmicas para Telas Deitadas ou Muito Baixas */
-        @media (max-height: 500px) {
+        /* Ajustes de Segurança Extras para Modo Paisagem (Telas Deitadas) */
+        @media (max-height: 520px) {
             .control-hub {
                 bottom: 4px;
                 padding: 10px;
                 gap: 6px;
                 border-radius: 12px;
-                max-height: calc(100% - 8px);
             }
             .control-row { gap: 6px; }
-            .btn { padding: 8px 4px; font-size: 11px; border-radius: 6px; flex-basis: 110px; }
-            select { height: 32px; font-size: 11px; padding: 4px; border-radius: 6px; flex-basis: 110px; }
+            .btn { padding: 8px 4px; font-size: 11px; min-width: 95px; }
+            select { height: 32px; font-size: 11px; padding: 4px; min-width: 95px; }
         }
 
         /* Gavetas Modais Laterais */
@@ -250,24 +265,24 @@
 <div class="control-hub" id="controlHub">
     <div class="control-row" style="border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; margin-bottom: 2px;">
         <span style="font-weight: bold; font-size: 13px; color: #64748b;">Configurações do Leitor</span>
-        <button class="btn" id="btnCloseHub" style="max-width: 32px; height: 26px; padding: 0; background: #cbd5e1; color: #1e293b; border: none; flex: 0 0 32px;">X</button>
+        <button class="btn" id="btnCloseHub" style="max-width: 32px; height: 26px; padding: 0; background: #cbd5e1; color: #1e293b; border: none; flex: 0 0 32px; min-width: 32px;">X</button>
     </div>
 
     <div class="control-row">
         <div class="file-upload-wrapper">
-            <button class="btn btn-prime" style="width: 100%;">📥 Importar Livro</button>
+            <button class="btn btn-prime" style="width: 100%; margin: 0;">📥 Importar Livro</button>
             <input type="file" id="fileInput" accept=".txt,.pdf,.html,.htm">
         </div>
         <button class="btn" id="btnOpenLibrary">📚 Minha Estante</button>
     </div>
 
     <div class="control-row">
-        <div style="display: flex; align-items: center; gap: 6px; flex: 1 1 160px; min-width: 0;">
-            <button class="btn" id="btnFontMinus" style="padding: 10px 0;">A-</button>
-            <span id="lblZoomType" style="font-size:12px; font-weight:bold; min-width:65px; text-align:center; white-space:nowrap;">Texto 17px</span>
-            <button class="btn" id="btnFontPlus" style="padding: 10px 0;">A+</button>
+        <div style="display: flex; align-items: center; gap: 4px; flex: 1 1 calc(50% - 4px); min-width: 110px;">
+            <button class="btn" id="btnFontMinus" style="flex: 1; min-width: 0; padding: 10px 0;">A-</button>
+            <span id="lblZoomType" style="font-size:11px; font-weight:bold; width:62px; text-align:center; white-space:nowrap; flex-shrink: 0; color:#475569;">Texto 17px</span>
+            <button class="btn" id="btnFontPlus" style="flex: 1; min-width: 0; padding: 10px 0;">A+</button>
         </div>
-        <button class="btn" id="btnOpenBookmarks" style="flex: 1 1 100px;">🔖 Marcadores</button>
+        <button class="btn" id="btnOpenBookmarks">🔖 Marcadores</button>
     </div>
 
     <div class="control-row">
@@ -293,21 +308,21 @@
         <button class="btn" id="btnFullscreen" style="background-color: #e2e8f0;">📺 Tela Cheia</button>
     </div>
 
-    <button class="btn" id="btnLoadDefault" style="background-color: #64748b; color: white; border: none; margin-top: 2px; flex: 0 0 auto; width: 100%;">📖 Voltar para Livro Padrão</button>
+    <button class="btn" id="btnLoadDefault" style="background-color: #64748b; color: white; border: none; margin-top: 2px; flex: 0 0 100%; width: 100%;">📖 Voltar para Livro Padrão</button>
 </div>
 
 <div class="side-panel" id="panelLibrary">
     <div class="panel-header">
-        <h3 style="font-size: 16px;">Sua Biblioteca</h3>
-        <button class="btn" onclick="closePanels()" style="max-width:35px; padding: 4px;">X</button>
+        <h3 style="font-size: 16px; margin: 0;">Sua Biblioteca</h3>
+        <button class="btn" onclick="closePanels()" style="max-width:35px; min-width:35px; padding: 4px;">X</button>
     </div>
     <div class="panel-list" id="libraryList"></div>
 </div>
 
 <div class="side-panel" id="panelBookmarks">
     <div class="panel-header">
-        <h3 style="font-size: 16px;">Marcadores</h3>
-        <button class="btn" onclick="closePanels()" style="max-width:35px; padding: 4px;">X</button>
+        <h3 style="font-size: 16px; margin: 0;">Marcadores</h3>
+        <button class="btn" onclick="closePanels()" style="max-width:35px; min-width:35px; padding: 4px;">X</button>
     </div>
     <div class="panel-list" id="bookmarksList"></div>
 </div>
@@ -616,206 +631,3 @@
     fileInput.addEventListener('change', (e) => {
         const file = e.target.files[0]; if (!file) return;
         const titleClean = file.name.replace(/\.[^/.]+$/, "");
-        closePanels();
-
-        if (file.type === "application/pdf" || file.name.endsWith(".pdf")) {
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                const typedarray = new Uint8Array(evt.target.result);
-                pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
-                    if (pendingPdfLoadingId) {
-                        currentPage = parseInt(safeStorage.getItem(DB_PREFIX + 'progress_' + pendingPdfLoadingId) || "0", 10);
-                        currentBook = { id: pendingPdfLoadingId, title: titleClean, text: "", pages: [], isPDF: true, pdfDoc: pdf, totalPages: pdf.numPages };
-                        storePDFInDB(pendingPdfLoadingId, evt.target.result);
-                        pendingPdfLoadingId = null;
-                    } else {
-                        const newId = "pdf_" + Date.now();
-                        currentBook = { id: newId, title: titleClean, text: "", pages: [], isPDF: true, pdfDoc: pdf, totalPages: pdf.numPages };
-                        currentPage = 0;
-                        saveToLibraryMetadata(newId, titleClean, true);
-                        storePDFInDB(newId, evt.target.result);
-                    }
-                    pdfZoom = 1.0;
-                    render();
-                }).catch(err => alert("Erro no PDF: " + err.message));
-            };
-            reader.readAsArrayBuffer(file);
-        } else if (file.name.endsWith(".html") || file.name.endsWith(".htm")) {
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(evt.target.result, 'text/html');
-                const textContent = doc.body.innerText || doc.body.textContent || "";
-                currentBook = { id: "html_" + Date.now(), title: titleClean, text: textContent, pages: [], isPDF: false, pdfDoc: null, totalPages: 0 };
-                currentBook.pages = paginateText(textContent);
-                currentPage = 0;
-                saveToLibraryMetadata(currentBook.id, titleClean, false, textContent);
-                render();
-            };
-            reader.readAsText(file, 'UTF-8');
-        } else {
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                currentBook = { id: "txt_" + Date.now(), title: titleClean, text: evt.target.result, pages: [], isPDF: false, pdfDoc: null, totalPages: 0 };
-                currentBook.pages = paginateText(evt.target.result);
-                currentPage = 0;
-                saveToLibraryMetadata(currentBook.id, titleClean, false, evt.target.result);
-                render();
-            };
-            reader.readAsText(file, 'UTF-8');
-        }
-    });
-
-    function saveToLibraryMetadata(id, title, isPDF, rawText = "") {
-        if (library.some(b => b.title === title)) return;
-        const item = { id: id, title: title, isPDF: isPDF };
-        library.push(item);
-        safeStorage.setItem(DB_PREFIX + 'library_meta', JSON.stringify(library));
-        if (!isPDF && rawText) { safeStorage.setItem(DB_PREFIX + 'book_data_' + id, rawText); }
-    }
-
-    function buildLibraryUI() {
-        const list = document.getElementById('libraryList'); list.innerHTML = '';
-        if(library.length === 0) { list.innerHTML = '<div style="text-align:center;padding:20px;font-size:12px;opacity:0.5;">Sua estante está vazia.</div>'; return; }
-        
-        library.forEach(book => {
-            const row = document.createElement('div');
-            row.className = 'panel-item';
-            
-            const infoArea = document.createElement('div');
-            infoArea.style.flexGrow = '1';
-            infoArea.style.cursor = 'pointer';
-            infoArea.innerHTML = `<strong>${book.title}</strong> <span style="font-size:10px; opacity:0.6; display:block;">Tipo: ${book.isPDF ? 'PDF':'TEXTO'}</span>`;
-            
-            infoArea.addEventListener('click', () => {
-                closePanels();
-                const savedProgress = parseInt(safeStorage.getItem(DB_PREFIX + 'progress_' + book.id) || "0", 10);
-                
-                if (book.isPDF) {
-                    getPDFFromDB(book.id, function(arrayBuffer) {
-                        if (arrayBuffer) {
-                            const typedarray = new Uint8Array(arrayBuffer);
-                            pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
-                                currentBook = { id: book.id, title: book.title, text: "", pages: [], isPDF: true, pdfDoc: pdf, totalPages: pdf.numPages };
-                                currentPage = savedProgress;
-                                pdfZoom = 1.0;
-                                render();
-                            }).catch(() => alert("Erro ao carregar o PDF do banco de dados local."));
-                        } else {
-                            pendingPdfLoadingId = book.id;
-                            alert("Por segurança, selecione o arquivo original deste PDF uma última vez para migrá-lo ao novo banco permanente.");
-                            fileInput.click();
-                        }
-                    });
-                } else {
-                    const savedText = safeStorage.getItem(DB_PREFIX + 'book_data_' + book.id) || "";
-                    currentBook = { id: book.id, title: book.title, text: savedText, pages: [], isPDF: false, pdfDoc: null, totalPages: 0 };
-                    currentBook.pages = paginateText(savedText);
-                    currentPage = savedProgress;
-                    render();
-                }
-            });
-
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'delete-btn';
-            deleteBtn.innerHTML = '🗑️';
-            deleteBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                if (confirm(`Deseja apagar permanentemente "${book.title}" da sua estante?`)) {
-                    library = library.filter(b => b.id !== book.id);
-                    safeStorage.setItem(DB_PREFIX + 'library_meta', JSON.stringify(library));
-                    safeStorage.removeItem(DB_PREFIX + 'book_data_' + book.id);
-                    safeStorage.removeItem(DB_PREFIX + 'progress_' + book.id);
-                    if (book.isPDF) deletePDFFromDB(book.id);
-                    
-                    if (currentBook && currentBook.id === book.id) {
-                        document.getElementById('btnLoadDefault').click();
-                    } else {
-                        buildLibraryUI();
-                    }
-                }
-            });
-
-            row.appendChild(infoArea);
-            row.appendChild(deleteBtn);
-            list.appendChild(row);
-        });
-    }
-
-    function saveReadingProgress() {
-        if (currentBook && currentBook.id && currentBook.id !== "default") {
-            safeStorage.setItem(DB_PREFIX + 'progress_' + currentBook.id, currentPage);
-            safeStorage.setItem(DB_PREFIX + 'last_active_id', currentBook.id);
-        }
-    }
-
-    document.getElementById('btnOpenLibrary').addEventListener('click', () => { closePanels(); buildLibraryUI(); document.getElementById('panelLibrary').classList.add('active'); uiOverlay.classList.add('active'); });
-    document.getElementById('btnOpenBookmarks').addEventListener('click', () => {
-        closePanels();
-        const list = document.getElementById('bookmarksList'); list.innerHTML = '';
-        const bookKey = currentBook.title || "default";
-        if (!bookmarks[bookKey] || bookmarks[bookKey].length === 0) { list.innerHTML = '<div style="text-align:center;padding:20px;font-size:12px;opacity:0.5;">Nenhum marcador neste livro.</div>'; } 
-        else {
-            bookmarks[bookKey].forEach(pIdx => {
-                const row = document.createElement('div'); row.className = 'panel-item'; row.innerText = `Página ${pIdx + 1}`;
-                row.addEventListener('click', () => { currentPage = pIdx; closePanels(); render(); });
-                list.appendChild(row);
-            });
-        }
-        document.getElementById('panelBookmarks').classList.add('active'); uiOverlay.classList.add('active');
-    });
-
-    document.getElementById('btnLoadDefault').addEventListener('click', () => {
-        currentBook = { id: "default", title: "Dom Casmurro", text: defaultBookText, pages: [], isPDF: false, pdfDoc: null, totalPages: 0 };
-        currentBook.pages = paginateText(defaultBookText);
-        currentPage = 0; closePanels(); render();
-    });
-
-    window.addEventListener('load', () => {
-        try {
-            const savedLib = safeStorage.getItem(DB_PREFIX + 'library_meta');
-            const savedMarks = safeStorage.getItem(DB_PREFIX + 'bookmarks');
-            if (savedLib) library = JSON.parse(savedLib);
-            if (savedMarks) bookmarks = JSON.parse(savedMarks);
-        } catch(e) {}
-
-        setTimeout(() => {
-            try {
-                const lastId = safeStorage.getItem(DB_PREFIX + 'last_active_id');
-                if (lastId && lastId !== "default") {
-                    const found = library.find(b => b.id === lastId);
-                    if (found) {
-                        if (found.isPDF) {
-                            getPDFFromDB(found.id, function(arrayBuffer) {
-                                if (arrayBuffer) {
-                                    const typedarray = new Uint8Array(arrayBuffer);
-                                    pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
-                                        currentBook = { id: found.id, title: found.title, text: "", pages: [], isPDF: true, pdfDoc: pdf, totalPages: pdf.numPages };
-                                        currentPage = parseInt(safeStorage.getItem(DB_PREFIX + 'progress_' + found.id) || "0", 10);
-                                        pdfZoom = 1.0;
-                                        render();
-                                    });
-                                } else {
-                                    document.getElementById('btnLoadDefault').click();
-                                }
-                            });
-                            return;
-                        } else {
-                            const textData = safeStorage.getItem(DB_PREFIX + 'book_data_' + found.id);
-                            if (textData) {
-                                currentBook = { id: found.id, title: found.title, text: textData, pages: [], isPDF: false, pdfDoc: null, totalPages: 0 };
-                                currentBook.pages = paginateText(textData);
-                                currentPage = parseInt(safeStorage.getItem(DB_PREFIX + 'progress_' + found.id) || "0", 10);
-                                render();
-                                return;
-                            }
-                        }
-                    }
-                }
-            } catch(e) {}
-            document.getElementById('btnLoadDefault').click();
-        }, 150);
-    });
-</script>
-</body>
-</html>
