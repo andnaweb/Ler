@@ -24,19 +24,15 @@
             top: 0; left: 0; right: 0; bottom: 0;
             background-color: #111;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            
-            /* Trava Definitiva Antifont-Boosting */
-            -webkit-text-size-adjust: 100% !important;
-            text-size-adjust: 100% !important;
-            -moz-text-size-adjust: 100% !important;
         }
 
-        /* Proteção Tipográfica Estrutural em Cascata */
-        *, *::before, *::after {
+        /* Trava Definitiva Antifont-Boosting em Cascata Global */
+        html, body, div, span, button, select, option, input, *, *::before, *::after {
             box-sizing: border-box;
             max-height: 999999px !important; 
             -webkit-text-size-adjust: 100% !important;
             text-size-adjust: 100% !important;
+            -moz-text-size-adjust: 100% !important;
             user-select: none;
             -webkit-user-select: none;
         }
@@ -95,7 +91,7 @@
             font-size: 17px;
             line-height: 1.6;
             text-align: justify;
-            overflow: hidden !important; 
+            overflow: hidden !important;
             white-space: pre-wrap;
             display: flex;
             flex-direction: column;
@@ -117,8 +113,8 @@
         .book-content canvas { 
             display: block; 
             margin: 0 auto; 
-            max-width: 100% !important;  
-            max-height: 100% !important;
+            max-width: none !important;  
+            max-height: none !important;
             object-fit: contain; 
         }
 
@@ -141,7 +137,7 @@
             transition: width 0.25s ease;
         }
 
-        /* Painel de Controle Flutuante Otimizado */
+        /* Painel de Controle Altamente Responsivo e Antiquebra */
         .control-hub {
             position: fixed;
             bottom: 12px; left: 50%;
@@ -149,6 +145,7 @@
             width: 94%; max-width: 410px;
             max-height: calc(100% - 24px);
             overflow-y: auto;
+            overflow-x: hidden;
             background: rgba(255, 255, 255, 0.98);
             border: 1px solid #cbd5e1;
             padding: 14px; border-radius: 16px;
@@ -159,27 +156,45 @@
             color: #334155;
         }
         .control-hub.active { transform: translate(-50%, 0); opacity: 1; visibility: visible; }
-        .control-row { display: flex; justify-content: space-between; align-items: center; gap: 6px; width: 100%; }
+        
+        .control-row { 
+            display: flex; 
+            flex-wrap: wrap; 
+            justify-content: space-between; 
+            align-items: center; 
+            gap: 8px; 
+            width: 100%; 
+        }
 
         .btn {
-            flex: 1; background-color: #f1f5f9; border: 1px solid #cbd5e1; color: #334155;
+            flex: 1 1 130px; 
+            background-color: #f1f5f9; border: 1px solid #cbd5e1; color: #334155;
             padding: 10px 4px; border-radius: 8px; cursor: pointer; font-size: 12px;
             font-weight: 600; text-align: center; white-space: nowrap;
+            min-width: 0;
         }
         .btn-prime { background-color: #2563eb; color: white; border: none; }
-        .file-upload-wrapper { position: relative; overflow: hidden; flex: 1; display: flex; }
+        .file-upload-wrapper { position: relative; overflow: hidden; flex: 1 1 130px; display: flex; }
         .file-upload-wrapper input[type=file] { position: absolute; left: 0; top: 0; opacity: 0; height: 100%; width: 100%; cursor: pointer; }
 
         select {
             padding: 8px 4px; border-radius: 8px; border: 1px solid #cbd5e1;
-            background: white; font-size: 12px; flex: 1; color: #334155; height: 36px;
+            background: white; font-size: 12px; flex: 1 1 130px; color: #334155; height: 36px;
+            min-width: 0;
         }
 
-        @media (max-height: 450px) {
-            .control-hub { bottom: 6px; padding: 10px; gap: 6px; border-radius: 12px; }
-            .control-row { gap: 4px; }
-            .btn { padding: 6px 4px; font-size: 11px; border-radius: 6px; }
-            select { height: 30px; font-size: 11px; padding: 4px; border-radius: 6px; }
+        /* Otimizações Dinâmicas para Telas Deitadas ou Muito Baixas */
+        @media (max-height: 500px) {
+            .control-hub {
+                bottom: 4px;
+                padding: 10px;
+                gap: 6px;
+                border-radius: 12px;
+                max-height: calc(100% - 8px);
+            }
+            .control-row { gap: 6px; }
+            .btn { padding: 8px 4px; font-size: 11px; border-radius: 6px; flex-basis: 110px; }
+            select { height: 32px; font-size: 11px; padding: 4px; border-radius: 6px; flex-basis: 110px; }
         }
 
         /* Gavetas Modais Laterais */
@@ -235,22 +250,24 @@
 <div class="control-hub" id="controlHub">
     <div class="control-row" style="border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; margin-bottom: 2px;">
         <span style="font-weight: bold; font-size: 13px; color: #64748b;">Configurações do Leitor</span>
-        <button class="btn" id="btnCloseHub" style="max-width: 32px; height: 26px; padding: 0; background: #cbd5e1; color: #1e293b; border: none;">X</button>
+        <button class="btn" id="btnCloseHub" style="max-width: 32px; height: 26px; padding: 0; background: #cbd5e1; color: #1e293b; border: none; flex: 0 0 32px;">X</button>
     </div>
 
     <div class="control-row">
         <div class="file-upload-wrapper">
-            <button class="btn btn-prime">📥 Importar Livro</button>
+            <button class="btn btn-prime" style="width: 100%;">📥 Importar Livro</button>
             <input type="file" id="fileInput" accept=".txt,.pdf,.html,.htm">
         </div>
         <button class="btn" id="btnOpenLibrary">📚 Minha Estante</button>
     </div>
 
     <div class="control-row">
-        <button class="btn" id="btnFontMinus">A-</button>
-        <span id="lblZoomType" style="font-size:12px; font-weight:bold; min-width:75px; text-align:center;">Texto 17px</span>
-        <button class="btn" id="btnFontPlus">A+</button>
-        <button class="btn" id="btnOpenBookmarks">🔖 Marcadores</button>
+        <div style="display: flex; align-items: center; gap: 6px; flex: 1 1 160px; min-width: 0;">
+            <button class="btn" id="btnFontMinus" style="padding: 10px 0;">A-</button>
+            <span id="lblZoomType" style="font-size:12px; font-weight:bold; min-width:65px; text-align:center; white-space:nowrap;">Texto 17px</span>
+            <button class="btn" id="btnFontPlus" style="padding: 10px 0;">A+</button>
+        </div>
+        <button class="btn" id="btnOpenBookmarks" style="flex: 1 1 100px;">🔖 Marcadores</button>
     </div>
 
     <div class="control-row">
@@ -268,15 +285,15 @@
     </div>
 
     <div class="control-row">
-        <select id="selectTheme" style="flex: 1;">
+        <select id="selectTheme">
             <option value="light">Modo Claro (Alvo)</option>
             <option value="sepia" selected>Modo Sépia (Conforto)</option>
             <option value="dark">Modo Escuro (Noite)</option>
         </select>
-        <button class="btn" id="btnFullscreen" style="flex: 1; background-color: #e2e8f0;">📺 Tela Cheia</button>
+        <button class="btn" id="btnFullscreen" style="background-color: #e2e8f0;">📺 Tela Cheia</button>
     </div>
 
-    <button class="btn" id="btnLoadDefault" style="background-color: #64748b; color: white; border: none; margin-top: 2px;">📖 Voltar para Livro Padrão</button>
+    <button class="btn" id="btnLoadDefault" style="background-color: #64748b; color: white; border: none; margin-top: 2px; flex: 0 0 auto; width: 100%;">📖 Voltar para Livro Padrão</button>
 </div>
 
 <div class="side-panel" id="panelLibrary">
@@ -296,15 +313,45 @@
 </div>
 
 <script>
+    // --- BANCO DE DADOS INDEXEDDB PARA ARQUIVOS SENSÍVEIS (PDFs) ---
     const DB_NAME = "KindleOS_Storage_DB";
     let localDB = null;
+    const dbRequest = indexedDB.open(DB_NAME, 1);
     
-    // Configuração correta do Worker do PDF.js
-    if (typeof pdfjsLib !== 'undefined') {
-        try { pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js'; } catch(e) { console.error(e); }
+    dbRequest.onupgradeneeded = function(e) {
+        let db = e.target.result;
+        if (!db.objectStoreNames.contains("pdf_files")) {
+            db.createObjectStore("pdf_files");
+        }
+    };
+    dbRequest.onsuccess = function(e) { localDB = e.target.result; };
+
+    function storePDFInDB(id, arrayBuffer) {
+        if (!localDB) return;
+        const tx = localDB.transaction("pdf_files", "readwrite");
+        tx.objectStore("pdf_files").put(arrayBuffer, id);
     }
 
-    const defaultBookText = `Dom Casmurro\n\nCapítulo 1 - Do título\n\nUma noite destas, vindo da cidade para o Engenho Novo, encontrei no trem da Central um rapaz aqui do bairro, que eu conheço de vista e de chapéu. Cumprimentou-me, sentou-se ao pé de mim, falou da lua e dos ministros, e acabou recitando-me versos. O trem seguiu, os versos continuaram, e a viagem parecia-me cada vez mais longa. Como eu não soubesse os versos de cor, limitei-me a abanar a cabeça em sinal de aprovação, mas o rapaz notou a minha distração e parou magoado.`;
+    function getPDFFromDB(id, callback) {
+        if (!localDB) { callback(null); return; }
+        const tx = localDB.transaction("pdf_files", "readonly");
+        const req = tx.objectStore("pdf_files").get(id);
+        req.onsuccess = function() { callback(req.result || null); };
+        req.onerror = function() { callback(null); };
+    }
+
+    function deletePDFFromDB(id) {
+        if (!localDB) return;
+        const tx = localDB.transaction("pdf_files", "readwrite");
+        tx.objectStore("pdf_files").delete(id);
+    }
+
+    if (typeof pdfjsLib !== 'undefined') {
+        try { pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js'; } catch(e) {}
+    }
+
+    const defaultBookText = `Dom Casmurro\n\nCapítulo 1 - Do título\n\nUma noite destes, vindo da cidade para o Engenho Novo, encontrei no trem da Central um rapaz aqui do bairro, que eu conheço de vista e de chapéu. Cumprimentou-me, sentou-se ao pé de mim, falou da lua e dos ministros, e acabou recitando-me versos. O trem seguiu, os versos continuaram, e a viagem parecia-me cada vez mais longa. Como eu não souumesse os versos de cor, limitei-me a abanar a cabeça em sinal de aprovação, mas o rapaz notou a minha distração e parou magoado.`;
+
     const DB_PREFIX = "kindle_v8_ultimate_";
 
     const memoryStorage = {};
@@ -347,8 +394,11 @@
         const pages = [];
         let index = 0;
         
-        let width = bookContent.clientWidth || window.innerWidth || 360;
-        let height = bookContent.clientHeight || window.innerHeight || 640;
+        let width = bookContent.clientWidth || window.innerWidth;
+        let height = bookContent.clientHeight || window.innerHeight;
+        
+        if (width < 100) width = window.innerWidth || 360;
+        if (height < 100) height = window.innerHeight || 640;
         
         const screenAreaFactor = (width * height) / 175000;
         let baseChars = 600 * screenAreaFactor;
@@ -357,8 +407,7 @@
         const currentLineHeight = parseFloat(bookContent.style.lineHeight || "1.6");
         const spacingCompensation = 1.6 / currentLineHeight;
         
-        let adjustedCharCount = Math.floor((baseChars - ((fontSize - 17) * 20)) * spacingCompensation);
-        adjustedCharCount = Math.max(150, adjustedCharCount); // Proteção para não zerar caracteres
+        const adjustedCharCount = Math.max(140, Math.floor((baseChars - ((fontSize - 17) * 28)) * spacingCompensation));
 
         while (index < text.length) {
             let chunk = text.substr(index, adjustedCharCount);
@@ -396,17 +445,17 @@
             
             currentBook.pdfDoc.getPage(currentPage + 1).then(function(page) {
                 const unscaledViewport = page.getViewport({ scale: 1 });
-                const containerW = bookContent.clientWidth || window.innerWidth || 360;
+                const containerW = bookContent.clientWidth || window.innerWidth;
                 
                 const baseScale = (containerW - 8) / unscaledViewport.width;
+                
                 const viewport = page.getViewport({ scale: baseScale * pdfZoom });
                 canvas.height = viewport.height;
                 canvas.width = viewport.width;
                 
                 const renderContext = { canvasContext: canvas.getContext('2d'), viewport: viewport };
                 page.render(renderContext);
-            }).catch((err) => {
-                console.error(err);
+            }).catch(() => {
                 bookContent.innerHTML = `<div style="padding:20px; color:red; font-size:14px;">Erro de renderização gráfica. Reduza o Zoom.</div>`;
             });
         } else {
@@ -572,23 +621,20 @@
         if (file.type === "application/pdf" || file.name.endsWith(".pdf")) {
             const reader = new FileReader();
             reader.onload = function(evt) {
-                const arrayBuffer = evt.target.result;
-                const typedarray = new Uint8Array(arrayBuffer);
-                
-                // Sintaxe atualizada e compatível para carregar o array de dados no PDF.js
-                pdfjsLib.getDocument({ data: typedarray }).promise.then(function(pdf) {
-                    const targetId = pendingPdfLoadingId || ("pdf_" + Date.now());
-                    currentBook = { id: targetId, title: titleClean, text: "", pages: [], isPDF: true, pdfDoc: pdf, totalPages: pdf.numPages };
-                    
+                const typedarray = new Uint8Array(evt.target.result);
+                pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
                     if (pendingPdfLoadingId) {
                         currentPage = parseInt(safeStorage.getItem(DB_PREFIX + 'progress_' + pendingPdfLoadingId) || "0", 10);
+                        currentBook = { id: pendingPdfLoadingId, title: titleClean, text: "", pages: [], isPDF: true, pdfDoc: pdf, totalPages: pdf.numPages };
+                        storePDFInDB(pendingPdfLoadingId, evt.target.result);
                         pendingPdfLoadingId = null;
                     } else {
+                        const newId = "pdf_" + Date.now();
+                        currentBook = { id: newId, title: titleClean, text: "", pages: [], isPDF: true, pdfDoc: pdf, totalPages: pdf.numPages };
                         currentPage = 0;
-                        saveToLibraryMetadata(targetId, titleClean, true);
+                        saveToLibraryMetadata(newId, titleClean, true);
+                        storePDFInDB(newId, evt.target.result);
                     }
-                    
-                    storePDFInDB(targetId, arrayBuffer);
                     pdfZoom = 1.0;
                     render();
                 }).catch(err => alert("Erro no PDF: " + err.message));
@@ -649,12 +695,12 @@
                     getPDFFromDB(book.id, function(arrayBuffer) {
                         if (arrayBuffer) {
                             const typedarray = new Uint8Array(arrayBuffer);
-                            pdfjsLib.getDocument({ data: typedarray }).promise.then(function(pdf) {
+                            pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
                                 currentBook = { id: book.id, title: book.title, text: "", pages: [], isPDF: true, pdfDoc: pdf, totalPages: pdf.numPages };
                                 currentPage = savedProgress;
                                 pdfZoom = 1.0;
                                 render();
-                            }).catch(() => alert("Erro ao carregar o PDF da base de dados local."));
+                            }).catch(() => alert("Erro ao carregar o PDF do banco de dados local."));
                         } else {
                             pendingPdfLoadingId = book.id;
                             alert("Por segurança, selecione o arquivo original deste PDF uma última vez para migrá-lo ao novo banco permanente.");
@@ -725,92 +771,51 @@
         currentPage = 0; closePanels(); render();
     });
 
-    // --- BANCO DE DADOS INDEXEDDB PARA ARQUIVOS SENSÍVEIS (PDFs) ---
-    const dbRequest = indexedDB.open(DB_NAME, 1);
-    
-    dbRequest.onupgradeneeded = function(e) {
-        let db = e.target.result;
-        if (!db.objectStoreNames.contains("pdf_files")) {
-            db.createObjectStore("pdf_files");
-        }
-    };
-
-    // A APLICAÇÃO SÓ ARRANCA QUANDO O INDEXEDDB ESTIVER PRONTO
-    dbRequest.onsuccess = function(e) { 
-        localDB = e.target.result; 
-        initializeAppLifeCycle();
-    };
-
-    dbRequest.onerror = function(e) {
-        console.error("Erro ao abrir IndexedDB. Rodando sem persistência de PDF local.");
-        initializeAppLifeCycle();
-    };
-
-    function storePDFInDB(id, arrayBuffer) {
-        if (!localDB) return;
-        const tx = localDB.transaction("pdf_files", "readwrite");
-        tx.objectStore("pdf_files").put(arrayBuffer, id);
-    }
-
-    function getPDFFromDB(id, callback) {
-        if (!localDB) { callback(null); return; }
-        const tx = localDB.transaction("pdf_files", "readonly");
-        const req = tx.objectStore("pdf_files").get(id);
-        req.onsuccess = function() { callback(req.result || null); };
-        req.onerror = function() { callback(null); };
-    }
-
-    function deletePDFFromDB(id) {
-        if (!localDB) return;
-        const tx = localDB.transaction("pdf_files", "readwrite");
-        tx.objectStore("pdf_files").delete(id);
-    }
-
-    // Fluxo estruturado de boot do App
-    function initializeAppLifeCycle() {
+    window.addEventListener('load', () => {
         try {
             const savedLib = safeStorage.getItem(DB_PREFIX + 'library_meta');
             const savedMarks = safeStorage.getItem(DB_PREFIX + 'bookmarks');
             if (savedLib) library = JSON.parse(savedLib);
             if (savedMarks) bookmarks = JSON.parse(savedMarks);
-        } catch(e) { console.error(e); }
+        } catch(e) {}
 
-        try {
-            const lastId = safeStorage.getItem(DB_PREFIX + 'last_active_id');
-            if (lastId && lastId !== "default") {
-                const found = library.find(b => b.id === lastId);
-                if (found) {
-                    if (found.isPDF) {
-                        getPDFFromDB(found.id, function(arrayBuffer) {
-                            if (arrayBuffer) {
-                                const typedarray = new Uint8Array(arrayBuffer);
-                                pdfjsLib.getDocument({ data: typedarray }).promise.then(function(pdf) {
-                                    currentBook = { id: found.id, title: found.title, text: "", pages: [], isPDF: true, pdfDoc: pdf, totalPages: pdf.numPages };
-                                    currentPage = parseInt(safeStorage.getItem(DB_PREFIX + 'progress_' + found.id) || "0", 10);
-                                    pdfZoom = 1.0;
-                                    render();
-                                }).catch(() => document.getElementById('btnLoadDefault').click());
-                            } else {
-                                document.getElementById('btnLoadDefault').click();
-                            }
-                        });
-                        return;
-                    } else {
-                        const textData = safeStorage.getItem(DB_PREFIX + 'book_data_' + found.id);
-                        if (textData) {
-                            currentBook = { id: found.id, title: found.title, text: textData, pages: [], isPDF: false, pdfDoc: null, totalPages: 0 };
-                            currentBook.pages = paginateText(textData);
-                            currentPage = parseInt(safeStorage.getItem(DB_PREFIX + 'progress_' + found.id) || "0", 10);
-                            render();
+        setTimeout(() => {
+            try {
+                const lastId = safeStorage.getItem(DB_PREFIX + 'last_active_id');
+                if (lastId && lastId !== "default") {
+                    const found = library.find(b => b.id === lastId);
+                    if (found) {
+                        if (found.isPDF) {
+                            getPDFFromDB(found.id, function(arrayBuffer) {
+                                if (arrayBuffer) {
+                                    const typedarray = new Uint8Array(arrayBuffer);
+                                    pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
+                                        currentBook = { id: found.id, title: found.title, text: "", pages: [], isPDF: true, pdfDoc: pdf, totalPages: pdf.numPages };
+                                        currentPage = parseInt(safeStorage.getItem(DB_PREFIX + 'progress_' + found.id) || "0", 10);
+                                        pdfZoom = 1.0;
+                                        render();
+                                    });
+                                } else {
+                                    document.getElementById('btnLoadDefault').click();
+                                }
+                            });
                             return;
+                        } else {
+                            const textData = safeStorage.getItem(DB_PREFIX + 'book_data_' + found.id);
+                            if (textData) {
+                                currentBook = { id: found.id, title: found.title, text: textData, pages: [], isPDF: false, pdfDoc: null, totalPages: 0 };
+                                currentBook.pages = paginateText(textData);
+                                currentPage = parseInt(safeStorage.getItem(DB_PREFIX + 'progress_' + found.id) || "0", 10);
+                                render();
+                                return;
+                            }
                         }
                     }
                 }
-            }
-        } catch(e) { console.error(e); }
-        
-        document.getElementById('btnLoadDefault').click();
-    }
+            } catch(e) {}
+            document.getElementById('btnLoadDefault').click();
+        }, 150);
+    });
 </script>
 </body>
 </html>
